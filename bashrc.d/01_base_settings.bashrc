@@ -63,12 +63,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-if [ -e ./aliases.sh ]; then
-    . ./aliases.sh
-fi
-
-for f in ./functions/*; do source $f; done
-
 function run-once-per-boot ()
 {
   if [ ! -f /tmp/dragon_has_logged_in ]; then
