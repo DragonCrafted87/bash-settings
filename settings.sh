@@ -1,9 +1,10 @@
 ﻿
-HISTCONTROL=ignoredups:ignorespace:erasedups
-shopt -s histappend
+
+HISTCONTROL='ignoredups:ignorespace:erasedups'
 HISTSIZE=1000
 HISTFILESIZE=2000
 shopt -s checkwinsize
+shopt -s histappend
 
 WHITE='\033[1;37m'
 BLACK='\033[0;30m'
@@ -25,9 +26,6 @@ NC='\033[0m'
 
 export VISUAL=nano
 export EDITOR="$VISUAL"
-
-export FORMAT="\nID\t{{.ID}}\nIMAGE\t{{.Image}}\nCOMMAND\t{{.Command}}\nCREATED\t{{.RunningFor}}\nSTATUS\t{{.Status}}\nPORTS\t{{.Ports}}\nNAMES\t{{.Names}}\n"
-
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
