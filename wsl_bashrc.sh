@@ -1,4 +1,3 @@
-
 export WSL=true
 
 sudo run-parts /etc/update-motd.d
