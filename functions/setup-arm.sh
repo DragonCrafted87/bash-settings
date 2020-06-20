@@ -1,16 +1,16 @@
 
-# curl -0 https://github.com/dragoncrafted87.keys > authorized_keys
+# curl -0 https://github.com/dragoncrafted87.keys > .ssh/authorized_keys
 
-
-# exec sudo -i
-function replace-user ()
+function set-ssh-key-only ()
 {
-  killall -u $1
-  id $1
-  usermod -l $2 $1
-  groupmod -n $2 $1
-  usermod -d /home/$2 -m $2
-  usermod -c $3 $2
-  id $2
+  # Only allow key based logins
+  cd /tmp
+  sed -n 'H;${x;s/\#PasswordAuthentication yes/PasswordAuthentication no/;p;}' /etc/ssh/sshd_config > tmp_sshd_config
+  sudo mv tmp_sshd_config /etc/ssh/sshd_config
+  rm tmp_sshd_config
 }
-# replace-user ubuntu dragon 'Scott Gudeman'
+
+function set-host-name ()
+{
+  sudo hostnamectl set-hostname $1
+}
