@@ -1,5 +1,3 @@
-﻿
-
 HISTCONTROL='ignoredups:ignorespace:erasedups'
 HISTSIZE=1000
 HISTFILESIZE=2000
@@ -63,15 +61,3 @@ if ! shopt -oq posix; then
   fi
 fi
 
-function run-once-per-boot ()
-{
-  if [ ! -f /tmp/dragon_has_logged_in ]; then
-    sleep 5
-    if [ "$WSL" = true ] ; then
-      wsl-fix-drive-mounts
-    fi
-    touch /tmp/dragon_has_logged_in
-  fi
-}
-
-run-once-per-boot &
