@@ -1,3 +1,4 @@
+#!/bin/bash
 
 function git-push-tags ()
 {

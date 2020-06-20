@@ -1,3 +1,4 @@
+#!/bin/bash
 
 function run-once-per-boot ()
 {

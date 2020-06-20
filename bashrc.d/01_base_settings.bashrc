@@ -1,3 +1,5 @@
+#!/bin/bash
+
 HISTCONTROL='ignoredups:ignorespace:erasedups'
 HISTSIZE=1000
 HISTFILESIZE=2000

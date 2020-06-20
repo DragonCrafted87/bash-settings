@@ -1,10 +1,8 @@
+#!/bin/bash
 
-function install-ansible ()
+export ANSIBLE_ROLES_PATH=~/.ansible/roles
+
+function ansible-install-requirements ()
 {
-  saved_working_directory=$PWD
-  cd $HOME
-  ansible-galaxy install geerlingguy.swap
-
-
-  cd $saved_working_directory
+  ansible-galaxy install -r requirements.yml
 }
