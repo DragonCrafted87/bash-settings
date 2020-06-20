@@ -27,6 +27,9 @@ NC='\033[0m'
 export VISUAL=nano
 export EDITOR="$VISUAL"
 
+export FORMAT="\nID\t{{.ID}}\nIMAGE\t{{.Image}}\nCOMMAND\t{{.Command}}\nCREATED\t{{.RunningFor}}\nSTATUS\t{{.Status}}\nPORTS\t{{.Ports}}\nNAMES\t{{.Names}}\n"
+
+
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
@@ -68,3 +71,11 @@ if [ -e ./aliases.sh ]; then
 fi
 
 for f in ./functions/*; do source $f; done
+
+function run-once-per-boot ()
+{
+  if [ ! -f /tmp/dragon_has_logged_in ]; then
+    wsl-fix-drive-mounts
+    touch /tmp/dragon_has_logged_in
+  fi
+}

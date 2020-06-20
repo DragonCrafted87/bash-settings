@@ -9,10 +9,19 @@ function wsl-install-apps ()
 
 function wsl-fix-drive-mounts ()
 {
-  cd ~
+  rm /home/dragon/repos
   sudo umount /mnt/c
   sudo umount /mnt/d
 
   sudo mount -t drvfs C: /mnt/c -o metadata,uid=1000,gid=1000,umask=22,fmask=111
   sudo mount -t drvfs D: /mnt/d -o metadata,uid=1000,gid=1000,umask=22,fmask=111
+
+  ln -s  /mnt/d/repos/ /home/dragon/repos
+}
+
+function wsl-fix-tmp ()
+{
+  sudo rm -r /tmp/*
+  sudo sh -c 'echo "tmpfs /tmp tmpfs nosuid,nodev,noatime 0 0" >> /etc/fstab'
+  sudo mount -a
 }
