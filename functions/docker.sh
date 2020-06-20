@@ -1,4 +1,3 @@
-#!/bin/bash
 
 function docker-build ()
 {

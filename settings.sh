@@ -1,5 +1,4 @@
-﻿#!/bin/bash
-
+﻿
 HISTCONTROL=ignoredups:ignorespace:erasedups
 shopt -s histappend
 HISTSIZE=1000
@@ -74,8 +73,13 @@ for f in ./functions/*; do source $f; done
 
 function run-once-per-boot ()
 {
+  sleep 5
   if [ ! -f /tmp/dragon_has_logged_in ]; then
-    wsl-fix-drive-mounts
+    if [ "$WSL" = true ] ; then
+      wsl-fix-drive-mounts
+    fi
     touch /tmp/dragon_has_logged_in
   fi
 }
+
+run-once-per-boot &

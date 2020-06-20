@@ -1,4 +1,3 @@
-#!/bin/bash
 
 function wsl-install-apps ()
 {
