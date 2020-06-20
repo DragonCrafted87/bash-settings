@@ -5,4 +5,5 @@ function setup-common ()
   sudo rm /root/.bashrc
   sudo ln -s /home/dragon/.bashrc /root/.bashrc
   sudo timedatectl set-timezone America/Chicago
+  sudo ln -s /usr/bin/python3 /usr/bin/python
 }

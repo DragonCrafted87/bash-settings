@@ -15,7 +15,7 @@ function wsl-fix-drive-mounts ()
   sudo mount -t drvfs C: /mnt/c -o metadata,uid=1000,gid=1000,umask=22,fmask=111
   sudo mount -t drvfs D: /mnt/d -o metadata,uid=1000,gid=1000,umask=22,fmask=111
 
-  ln -s  /mnt/d/repos/ /home/dragon/repos
+  sudo mount -t drvfs R: /home/dragon/repos -o metadata,uid=1000,gid=1000,umask=22,fmask=111
 }
 
 function wsl-fix-tmp ()
