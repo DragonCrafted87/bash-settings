@@ -71,8 +71,8 @@ for f in ./functions/*; do source $f; done
 
 function run-once-per-boot ()
 {
-  sleep 5
   if [ ! -f /tmp/dragon_has_logged_in ]; then
+    sleep 5
     if [ "$WSL" = true ] ; then
       wsl-fix-drive-mounts
     fi
