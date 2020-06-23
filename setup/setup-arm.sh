@@ -51,7 +51,7 @@ sudo sysctl --system
 
 
 
-
+sudo apt-get remove docker-ce docker-ce-cli containerd.io
 
 
 

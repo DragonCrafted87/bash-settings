@@ -25,3 +25,9 @@ function wsl-fix-tmp ()
   sudo sh -c 'echo "tmpfs /tmp tmpfs nosuid,nodev,noatime 0 0" >> /etc/fstab'
   sudo mount -a
 }
+
+function wsl-update-kubectl-config ()
+{
+  mkdir -p /home/dragon/.kube
+  scp dragonpimaster.lan:/home/dragon/.kube/config /home/dragon/.kube/config
+}

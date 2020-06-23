@@ -11,4 +11,6 @@ function run-once-per-boot ()
   fi
 }
 
-run-once-per-boot &
+if [ ! -f /tmp/dragon_has_logged_in ]; then
+  run-once-per-boot &
+fi

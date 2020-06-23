@@ -34,8 +34,12 @@ typeset +x PS1="${DARK_YELLOW}\u${NC}@${DARK_YELLOW}${HOSTNAME}${NC}:${CYAN}\w${
 
 export GOPATH=$HOME/go
 
-PATH=/home/dragon/bin:$PATH
+BASE_PATH=$PATH
+
+PATH=/home/dragon/bin
+PATH=$PATH:/home/dragon/.local/bin
 PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+PATH=$PATH:$BASE_PATH
 export PATH
 
 export KUBECONFIG=~/.kube/config
@@ -63,3 +67,10 @@ if ! shopt -oq posix; then
   fi
 fi
 
+if [ "$WSL" = true ] ; then
+  function update-bash-settings ()
+  {
+    cp ~/repos/bash-settings/bashrc.d/* ~/.bashrc.d/
+    source ~/.bashrc
+  }
+fi
