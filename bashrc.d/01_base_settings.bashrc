@@ -66,11 +66,3 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-
-if [ "$WSL" = true ] ; then
-  function update-bash-settings ()
-  {
-    cp ~/repos/bash-settings/bashrc.d/* ~/.bashrc.d/
-    source ~/.bashrc
-  }
-fi

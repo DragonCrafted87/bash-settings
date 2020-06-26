@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ -z $WSL ] ; then
+  return
+fi
+
 function wsl-install-apps ()
 {
   sudo apt install curl
@@ -29,5 +33,6 @@ function wsl-fix-tmp ()
 function wsl-update-kubectl-config ()
 {
   mkdir -p /home/dragon/.kube
-  scp dragonpimaster.lan:/home/dragon/.kube/config /home/dragon/.kube/config
+  scp dragonmaster.lan:/home/dragon/.kube/config /home/dragon/.kube/config
+  cp /home/dragon/.kube/config /mnt/c/Users/gudem/.kube
 }
