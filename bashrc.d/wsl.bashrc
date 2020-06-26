@@ -13,10 +13,13 @@ function wsl-install-apps ()
 
 function wsl-fix-drive-mounts ()
 {
-  rm /home/dragon/repos
-  mkdir /home/dragon/repos
-  sudo umount /mnt/c
-  sudo umount /mnt/d
+  if [ -z /home/dragon/repos ] ; then
+    mkdir /home/dragon/repos
+  fi
+
+  sudo umount /mnt/c 2>/dev/null
+  sudo umount /mnt/d 2>/dev/null
+  sudo umount /home/dragon/repos 2>/dev/null
 
   sudo mount -t drvfs C: /mnt/c -o metadata,uid=1000,gid=1000,umask=22,fmask=111
   sudo mount -t drvfs D: /mnt/d -o metadata,uid=1000,gid=1000,umask=22,fmask=111

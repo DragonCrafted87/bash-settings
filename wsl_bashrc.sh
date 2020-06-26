@@ -16,12 +16,13 @@ function update-bash-settings ()
 function run-once-per-boot ()
 {
   if [ ! -f /tmp/dragon_has_logged_in ]; then
-    sleep 5
     wsl-fix-drive-mounts
+    sudo apt update
+    apt list --upgradable
     touch /tmp/dragon_has_logged_in
   fi
 }
 
 if [ ! -f /tmp/dragon_has_logged_in ]; then
-  run-once-per-boot &
+  run-once-per-boot
 fi
