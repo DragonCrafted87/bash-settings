@@ -12,6 +12,20 @@ function docker-build ()
   .
 }
 
+function docker-build-local ()
+{
+  docker build \
+  --no-cache \
+  --file Dockerfile \
+  --tag $1 \
+  .
+}
+
+function docker-stop ()
+{
+  docker stop $(docker ps -a -q)
+}
+
 function docker-remove-all-images ()
 {
   #delete containers

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function kube-show-all ()
+function k8s-show-all ()
 {
   clear
   kubectl get nodes
@@ -13,4 +13,9 @@ function kube-show-all ()
   echo ''
   kubectl get pvc -A
   echo ''
+}
+
+function k8s-copy-cifs-secret-to-namespace ()
+{
+  kubectl get secret cifs-secret -n storage -o yaml | sed s/"namespace: storage"/"namespace: $1"/ | kubectl apply -f -
 }

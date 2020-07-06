@@ -1,4 +1,6 @@
 
+return
+
 function setup-common ()
 {
   ssh-keygen -t ecdsa -b 521
