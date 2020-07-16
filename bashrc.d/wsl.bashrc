@@ -21,9 +21,12 @@ function wsl-fix-drive-mounts ()
   sudo umount /mnt/d 2>/dev/null
   sudo umount /home/dragon/repos 2>/dev/null
 
-  sudo mount -t drvfs C: /mnt/c -o metadata,uid=1000,gid=1000,umask=22,fmask=111
-  sudo mount -t drvfs D: /mnt/d -o metadata,uid=1000,gid=1000,umask=22,fmask=111
-  sudo mount -t drvfs R: /home/dragon/repos -o metadata,uid=1000,gid=1000,umask=22,fmask=111
+#  sudo mount -t drvfs C: /mnt/c -o metadata,uid=1000,gid=1000,umask=22,fmask=111
+#  sudo mount -t drvfs D: /mnt/d -o metadata,uid=1000,gid=1000,umask=22,fmask=111
+#  sudo mount -t drvfs R: /home/dragon/repos -o metadata,uid=1000,gid=1000,umask=22,fmask=111
+
+  sudo mount.cifs //dragondata.lan/Storage/Programming/git-repos /home/dragon/repos -o vers=3.0,credentials=/home/dragon/.smb_credentials,iocharset=utf8,file_mode=0777,dir_mode=0777
+
 }
 
 function wsl-fix-tmp ()

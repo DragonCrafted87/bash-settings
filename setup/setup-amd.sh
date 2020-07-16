@@ -1,19 +1,26 @@
 
 
-# Install SBC utility packages
-apt install -y nfs-common less vim ack git build-essential iptables ipset pciutils lshw file iperf3 net-tools lsb-release
+# Install prerequsite packages for K8s and Docker
+apt install -y nfs-common less vim ack git build-essential iptables ipset pciutils lshw file iperf3 net-tools lsb-release apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 # Fix ping permission
 chmod +s /bin/ping*
-# Install Docker pre-requisites
-apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 
 # Add Docker?s official GPG key
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
 add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) \
    stable"
+
+add-apt-repository \
+   "deb [arch=amd64] https://apt.kubernetes.io/ \
+   kubernetes-xenial \
+   main"
+
+
+
 
 apt-get update; apt-get install -y docker-ce docker-ce-cli containerd.io
 
@@ -34,7 +41,6 @@ systemctl daemon-reload
 systemctl restart docker
 systemctl enable docker
 
-
 modprobe br_netfilter
 
 cat <<EOF | tee /etc/sysctl.d/k8s.conf
@@ -44,12 +50,6 @@ EOF
 
 sysctl --system
 
-apt-get update && apt-get install -y apt-transport-https curl
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-add-apt-repository \
-   "deb [arch=amd64] https://apt.kubernetes.io/ \
-   kubernetes-xenial \
-   main"
 apt-get update; apt-get install -y kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
 
@@ -59,7 +59,59 @@ systemctl restart kubelet
 kubeadm config images pull
 
 
-# dragonshadow
+# Master Node
+kubeadm init
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+#Worker Node
+kubeadm join <control-plane-host>:<control-plane-port> --token <token> --discovery-token-ca-cert-hash sha256:<hash>
+
+kubeadm join 192.168.0.50:6443 --token 2ymhqk.cr040hji8mtuxo3o \
+    --discovery-token-ca-cert-hash sha256:f78f5f1320f60c6258316b025160b2f55b2a96e1095f9e11634d4b6db84df9aa
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#create mount directories
+sudo mkdir /mnt/staging_area
+
+sudo mkdir /mnt/enclosure1_drive1
+sudo mkdir /mnt/enclosure1_drive2
+sudo mkdir /mnt/enclosure1_drive3
+sudo mkdir /mnt/enclosure1_drive4
+sudo mkdir /mnt/enclosure1_drive5
+sudo mkdir /mnt/enclosure1_drive6
+sudo mkdir /mnt/enclosure1_drive7
+sudo mkdir /mnt/enclosure1_drive8
+
+sudo mkdir /mnt/enclosure2_drive1
+sudo mkdir /mnt/enclosure2_drive2
+sudo mkdir /mnt/enclosure2_drive3
+sudo mkdir /mnt/enclosure2_drive4
+sudo mkdir /mnt/enclosure2_drive5
+
 # Storage Drives
 UUID=55d7e772-35b4-4367-b8ec-beba0d156493 /mnt/staging_area ext4 defaults,noatime,nofail 0 0
 
@@ -72,21 +124,6 @@ UUID=d5ba4935-f296-4179-a20b-28fb842be89e /mnt/enclosure1_drive4 ext4 defaults,n
 # UUID=3A8A9C448A9BFA99 /mnt/enclosure1_drive6 ntfs defaults 0 0
 # UUID=D2AE99F9AE99D677 /mnt/enclosure1_drive7 ntfs defaults 0 0
 UUID=c262e8eb-f9bf-45ff-ad88-5c957c6ae306 /mnt/enclosure1_drive8 ext4 defaults,noatime,nofail 0 0
-
-
-# dragonmaster
-mkdir /mnt/enclosure2_drive1
-mkdir /mnt/enclosure2_drive2
-mkdir /mnt/enclosure2_drive3
-mkdir /mnt/enclosure2_drive4
-mkdir /mnt/enclosure2_drive5
-
-
-
-
-#Bare Drives
-UUID=e88cc1f5-d619-4970-b720-cf93f5cf1a72 /mnt/drive1 ext4 defaults,noatime,nofail 0 0
-UUID=34bc1df2-afe0-4336-9d8b-78dbe60607fc /mnt/drive2 ext4 defaults,noatime,nofail 0 0
 
 # Enclosure 2
 UUID=105ee73f-02ee-4585-a70f-9fca87ebb06b /mnt/enclosure2_drive1 ext4 defaults,noatime,nofail 0 0
