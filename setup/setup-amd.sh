@@ -60,18 +60,20 @@ kubeadm config images pull
 
 
 # Master Node
-kubeadm init
+sudo kubeadm init --pod-network-cidr 172.16.0.0/12
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 #Worker Node
-kubeadm join <control-plane-host>:<control-plane-port> --token <token> --discovery-token-ca-cert-hash sha256:<hash>
+sudo kubeadm join <control-plane-host>:<control-plane-port> --token <token> --discovery-token-ca-cert-hash sha256:<hash>
 
 kubeadm join 192.168.0.50:6443 --token 2ymhqk.cr040hji8mtuxo3o \
     --discovery-token-ca-cert-hash sha256:f78f5f1320f60c6258316b025160b2f55b2a96e1095f9e11634d4b6db84df9aa
 
-
+kubectl apply -f https://raw.githubusercontent.com/cloudnativelabs/kube-router/master/daemonset/kubeadm-kuberouter-all-features.yaml
+kubectl -n kube-system delete ds kube-proxy
+docker run --privileged -v /lib/modules:/lib/modules --net=host k8s.gcr.io/kube-proxy-amd64:v1.15.1 kube-proxy --cleanup
 
 
 
