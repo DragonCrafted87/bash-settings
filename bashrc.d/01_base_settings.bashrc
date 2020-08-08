@@ -38,6 +38,7 @@ BASE_PATH=$PATH
 
 PATH=/home/dragon/bin
 PATH=$PATH:/home/dragon/.local/bin
+PATH=$PATH:/home/dragon/scripts
 PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 PATH=$PATH:$BASE_PATH
 export PATH
