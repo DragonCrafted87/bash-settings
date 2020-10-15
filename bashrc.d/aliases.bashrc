@@ -24,6 +24,8 @@ alias which='alias | /usr/bin/which --tty-only --read-alias --show-dot --show-ti
 alias replacecpp='find ${PWD} -name "*.cpp" | xargs perl -pi -e '
 alias replaceh='find ${PWD} -name "*.h" | xargs perl -pi -e '
 
+alias ps-parents='ps axo stat,ppid,pid,comm | grep -w defunct'
+
 function base_find ()
 {
     FIND_EXCLUDES=' | grep -v "\.git" '
