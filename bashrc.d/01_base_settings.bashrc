@@ -30,7 +30,6 @@ export EDITOR="$VISUAL"
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-typeset +x PS1="${DARK_YELLOW}\u${NC}@${DARK_YELLOW}${HOSTNAME}${NC}:${CYAN}\w${NC}\n> "
 
 export GOPATH=$HOME/go
 
@@ -40,6 +39,7 @@ PATH=/home/dragon/bin
 PATH=$PATH:/home/dragon/.local/bin
 PATH=$PATH:/home/dragon/scripts
 PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+PATH=$PATH:$HOME/bash-settings/scripts
 PATH=$PATH:$BASE_PATH
 export PATH
 
