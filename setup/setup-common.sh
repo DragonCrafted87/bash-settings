@@ -15,13 +15,13 @@ sudo ln -s /home/dragon/.bashrc.d/ /root/.bashrc.d
 sudo timedatectl set-timezone America/Chicago
 sudo ln -s /usr/bin/python3 /usr/bin/python
 
-sudo apt autoremove --purge snapd
 sudo apt autoremove --purge kubeadm  kubectl  kubelet
 sudo apt autoremove --purge docker-ce docker-ce-cli containerd.io
 
 #add to root crontab
+sudo crontab -e
 # @reboot sudo swapoff -a
 # also remove entry in /etc/fstab
+sudo nano /etc/fstab
 
-#edit
-sudo nano /etc/update-manager/release-upgrades
+sudo apt dist-upgrade
