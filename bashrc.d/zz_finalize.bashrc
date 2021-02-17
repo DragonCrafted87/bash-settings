@@ -43,7 +43,7 @@ function color_my_prompt {
 }
 
 # configure PROMPT_COMMAND which is executed each time before PS1
-export PROMPT_COMMAND=color_my_prompt
+PROMPT_COMMAND=color_my_prompt
 
 # if .git-prompt.sh exists, set options and execute it
 GIT_PS1_SHOWDIRTYSTATE=true
@@ -53,3 +53,6 @@ GIT_PS1_SHOWUPSTREAM="auto"
 GIT_PS1_HIDE_IF_PWD_IGNORED=true
 GIT_PS1_SHOWCOLORHINTS=true
 . git-prompt.sh
+
+PROMPT_COMMAND="echo -ne '\033]0;${USER}@${HOSTNAME}\007';$PROMPT_COMMAND"
+export PROMPT_COMMAND
