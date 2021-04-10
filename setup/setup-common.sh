@@ -24,4 +24,18 @@ sudo crontab -e
 # also remove entry in /etc/fstab
 sudo nano /etc/fstab
 
+sudo apt update
 sudo apt dist-upgrade
+
+# do hw specific setup
+
+sudo apt install nfs-common cifs-utils
+sudo apt install cifs-utils
+
+
+#install microk8s
+sudo snap install microk8s --classic --channel=1.19/stable
+
+#from an active node run then execute the join command
+microk8s add-node
+

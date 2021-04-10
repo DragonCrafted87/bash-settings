@@ -17,29 +17,11 @@ function color_my_prompt {
       __git_branch_color="$LIGHT_CYAN"
   fi
 
-#  __git_branch="${__git_branch//(}"
-#  __git_branch="${__git_branch//)}"
-
-  if [[ "${__git_branch}" =~ "*" ]]; then     # if repository is dirty
-      __git_branch="${__git_branch//\*}"
-  fi
-  if [[ "${__git_branch}" =~ "$" ]]; then   # if there is something stashed
-      __git_branch="${__git_branch//$}"
-  fi
-  if [[ "${__git_branch}" =~ "%" ]]; then   # if there are only untracked files
-      __git_branch="${__git_branch//%}"
-  fi
-  if [[ "${__git_branch}" =~ "+" ]]; then   # if there are staged files
-      __git_branch="${__git_branch//+}"
-  fi
-  if [[ "${__git_branch}" =~ "=" ]]; then   # if there are staged files
-      __git_branch="${__git_branch//=}"
-  fi
+  __git_branch="${__git_branch_color}$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/')${NC}"
 
   local __prompt_tail=" \n> "
 
-  # Build the PS1 (Prompt String)
-  PS1="$__user_and_host $__cur_location$__git_branch_color$__git_branch${NC} $__prompt_tail"
+  PS1="$__user_and_host:$__cur_location$__git_branch$__prompt_tail"
 }
 
 # configure PROMPT_COMMAND which is executed each time before PS1

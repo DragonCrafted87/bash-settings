@@ -2,93 +2,11 @@ return
 
 
 
-# Install prerequsite packages for K8s and Docker
-apt install -y nfs-common less vim ack git build-essential iptables ipset pciutils lshw file iperf3 net-tools lsb-release apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-# Fix ping permission
-chmod +s /bin/ping*
-
-# Add Docker?s official GPG key
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-
-add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
-
-add-apt-repository \
-   "deb [arch=amd64] https://apt.kubernetes.io/ \
-   kubernetes-xenial \
-   main"
 
 
 
 
-apt-get update; apt-get install -y docker-ce docker-ce-cli containerd.io
-
-cat > /etc/docker/daemon.json <<EOF
-{
-  "exec-opts": ["native.cgroupdriver=systemd"],
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "100m"
-  },
-  "storage-driver": "overlay2"
-}
-EOF
-
-mkdir -p /etc/systemd/system/docker.service.d
-
-systemctl daemon-reload
-systemctl restart docker
-systemctl enable docker
-
-modprobe br_netfilter
-
-cat <<EOF | tee /etc/sysctl.d/k8s.conf
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-EOF
-
-sysctl --system
-
-apt-get update; apt-get install -y kubelet kubeadm kubectl
-apt-mark hold kubelet kubeadm kubectl
-
-systemctl daemon-reload
-systemctl restart kubelet
-
-kubeadm config images pull
-
-
-# Master Node
-sudo kubeadm init --pod-network-cidr 172.16.0.0/12
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
-
-kubeadm token create --print-join-command
-
-#Worker Node
-sudo kubeadm join <control-plane-host>:<control-plane-port> --token <token> --discovery-token-ca-cert-hash sha256:<hash>
-
-kubeadm join 192.168.0.50:6443 --token 2ymhqk.cr040hji8mtuxo3o \
-    --discovery-token-ca-cert-hash sha256:f78f5f1320f60c6258316b025160b2f55b2a96e1095f9e11634d4b6db84df9aa
-
-
-#finalize setup
-kubectl apply -f https://raw.githubusercontent.com/cloudnativelabs/kube-router/master/daemonset/kubeadm-kuberouter-all-features.yaml
-kubectl -n kube-system delete ds kube-proxy
-docker run --privileged -v /lib/modules:/lib/modules --net=host k8s.gcr.io/kube-proxy-amd64:v1.15.1 kube-proxy --cleanup
-
-
-
-
-
-
-
-
+sudo snap install microk8s --classic --channel=1.18/stable
 
 
 

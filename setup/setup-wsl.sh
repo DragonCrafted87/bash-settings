@@ -11,7 +11,7 @@ sudo rm /root/.bashrc
 sudo ln -s /home/dragon/.bashrc /root/.bashrc
 sudo ln -s /home/dragon/.bashrc.d/ /root/.bashrc.d
 
-sudo apt install cifs-utils
+# sudo apt install cifs-utils
 #
 #  # Helm Install
 #  curl https://helm.baltorepo.com/organization/signing.asc | sudo apt-key add -

@@ -1,7 +1,5 @@
 #!/bin/bash
-export GIT=true
-
-
+export GIT_BASH=true
 
 for file in $HOME/bash-settings/bashrc.d/*.bashrc;
 do
