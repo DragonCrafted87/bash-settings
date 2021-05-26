@@ -39,7 +39,7 @@ function base_find ()
     FIND_EXCLUDES=$FIND_EXCLUDES'| grep -v "PinnacleStatic/Python/scripting" '
     FIND_EXCLUDES=$FIND_EXCLUDES'| grep -v "/build/" '
     GREP_COMMAND='| xargs grep --color=always -s -n "'
-    FIND_END='" | more '
+    FIND_END='"'
     COMMAND=$1
     COMMAND=$COMMAND$FIND_EXCLUDES
     COMMAND=$COMMAND$GREP_COMMAND

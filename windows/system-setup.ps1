@@ -34,7 +34,6 @@ reg import "D:\git-home\bash-settings\windows\taskbar-laptop.reg"
 taskkill /f /im explorer.exe
 start explorer.exe
 
-
 Remove-ItemProperty -path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Streams\Desktop -Name TaskbarWinXP
 reg import "D:\git-home\bash-settings\windows\taskbar-desktop.reg"
 taskkill /f /im explorer.exe
