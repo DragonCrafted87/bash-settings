@@ -2,17 +2,15 @@
 
 function k8s-show-all ()
 {
-  clear
-  kubectl get nodes
-  echo ''
-  kubectl get all -A
-  echo ''
-  kubectl get StorageClass -A
-  echo ''
-  kubectl get pv -A
-  echo ''
-  kubectl get pvc -A
-  echo ''
+    clear
+    kubectl get nodes | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
+    kubectl get pods --all-namespaces | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
+    kubectl get deployments --all-namespaces | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
+    kubectl get daemonsets --all-namespaces | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
+    kubectl get job --all-namespaces | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
+    kubectl get cronjob --all-namespaces | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
+    kubectl get services --all-namespaces | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
+    kubectl get endpoints --all-namespaces | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
 }
 
 function k8s-copy-cifs-secret-to-namespace ()
