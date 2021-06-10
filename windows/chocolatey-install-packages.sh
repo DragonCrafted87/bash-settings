@@ -8,12 +8,11 @@ choco install bulk-crap-uninstaller
 choco install 7zip
 
 #DEV Tools
-choco install ultraedit
-choco install strawberryperl
+#choco install ultraedit
+#choco install strawberryperl
 choco install python3
 choco install racket
 choco install docker-desktop
-
 
 #C++ Tooling
 choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'

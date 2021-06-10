@@ -6,6 +6,7 @@ function k8s-show-all ()
     kubectl get nodes | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
     kubectl get pods --all-namespaces | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
     kubectl get deployments --all-namespaces | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
+    kubectl get replicasets --all-namespaces | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
     kubectl get daemonsets --all-namespaces | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
     kubectl get job --all-namespaces | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
     kubectl get cronjob --all-namespaces | (read -r; printf "%s\n" "$REPLY"; sort) && echo ''
