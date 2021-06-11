@@ -23,6 +23,9 @@ choco install winlibs
 #Java
 choco install AdoptOpenJDK --params="/ADDLOCAL=FeatureMain,FeatureEnvironment,FeatureJarFileRunWith,FeatureJavaHome /INSTALLDIR=C:\Program Files\AdoptOpenJDK\ /quiet"
 
+#Fitbit
+choco install nodejs
+
 #Applications
 choco install foxitreader --ia '/MERGETASKS="!desktopicon /COMPONENTS=*pdfviewer,*ffse,*installprint,*ffaddin,*ffspellcheck,!connectedpdf"'
 choco install microsoft-office-deployment --params '/64bit  /Product:O365HomePremRetail  /Exclude=Publisher,Lync,Groove,Access'
