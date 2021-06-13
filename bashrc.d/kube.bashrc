@@ -18,3 +18,8 @@ function k8s-copy-cifs-secret-to-namespace ()
 {
   kubectl get secret cifs-secret -n storage -o yaml | sed s/"namespace: storage"/"namespace: $1"/ | kubectl apply -f -
 }
+
+function k8s-apply-all ()
+{
+    kubectl.exe apply -f . --recursive
+}

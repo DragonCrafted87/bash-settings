@@ -22,3 +22,11 @@ function git-status-all-repos ()
           git status -s;
           echo "";' \;
 }
+
+function git-pull-all-repos ()
+{
+    find . -maxdepth 2 -name .git -type d -execdir sh -c '
+          basename -s .git `git config --get remote.origin.url`;
+          git pull;
+          echo "";' \;
+}
