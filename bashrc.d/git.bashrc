@@ -19,7 +19,7 @@ function git-status-all-repos ()
 {
     find . -maxdepth 2 -name .git -type d -execdir sh -c '
           basename -s .git `git config --get remote.origin.url`;
-          git status -s;
+          git status --short --branch;
           echo "";' \;
 }
 
@@ -28,5 +28,13 @@ function git-pull-all-repos ()
     find . -maxdepth 2 -name .git -type d -execdir sh -c '
           basename -s .git `git config --get remote.origin.url`;
           git pull;
+          echo "";' \;
+}
+
+function git-init-all-repos ()
+{
+    find . -maxdepth 2 -name .git -type d -execdir sh -c '
+          basename -s .git `git config --get remote.origin.url`;
+          git init;
           echo "";' \;
 }
