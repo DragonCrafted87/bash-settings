@@ -1,18 +1,36 @@
 #!/bin/bash
 
 return
+
 sudo apt install git curl ssh
 
 #ssh keys
 curl -0 https://github.com/dragoncrafted87.keys > .ssh/authorized_keys
 
-# Only allow key based logins
-cd /tmp
-sed -n 'H;${x;s/\#PasswordAuthentication yes/PasswordAuthentication no/;p;}' /etc/ssh/sshd_config > tmp_sshd_config
-sed -n 'H;${x;s/\PasswordAuthentication yes/PasswordAuthentication no/;p;}' tmp_sshd_config > tmp_sshd_config
-sudo mv tmp_sshd_config /etc/ssh/sshd_config
+git clone https://github.com/DragonCrafted87/bash-settings.git
+rm .bashrc
+rm .bashrc.d
+ln -s /home/dragon/bash-settings/media_bashrc.sh .bashrc
+ln -s /home/dragon/bash-settings/bashrc.d/ .bashrc.d
+
+sudo sh -c 'echo "dragon ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/sudoers'
+sudo rm /root/.bashrc
+sudo ln -s /home/dragon/.bashrc /root/.bashrc
+sudo ln -s /home/dragon/.bashrc.d/ /root/.bashrc.d
+sudo timedatectl set-timezone America/Chicago
+sudo ln -s /usr/bin/python3 /usr/bin/python
 
 sudo hostnamectl set-hostname medialivingroom.lan
+
+reboot
+
+sudo apt install x11vnc net-tools
+
+sudo mkdir /usr/share/wayland-sessions/hidden
+sudo dpkg-divert --rename \
+      --divert /usr/share/wayland-sessions/hidden/ubuntu.desktop \
+      --add /usr/share/wayland-sessions/ubuntu.desktop
+
 
 
 sudo apt install software-properties-common

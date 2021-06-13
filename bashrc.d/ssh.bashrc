@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#if [ -z $GIT ] ; then
-#  return
-#fi
+if [ -z $GIT ] ; then
+  return
+fi
 
 # Start SSH Agent
 #----------------------------
