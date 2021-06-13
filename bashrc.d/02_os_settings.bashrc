@@ -1,7 +1,6 @@
 #!/bin/bash
 
 case "$OSTYPE" in
-
     linux*)
         echo 'Linux'
     ;;
@@ -12,9 +11,6 @@ case "$OSTYPE" in
         export CMAKE_CXX_COMPILER='C:\ProgramData\chocolatey\lib\winlibs\tools\mingw64\bin\clang++.exe'
 
     ;;
-
-    # Add here more strings to compare
-    # See correspondence table at the bottom of this answer
 
     *)
         echo 'unknown: $OSTYPE'
