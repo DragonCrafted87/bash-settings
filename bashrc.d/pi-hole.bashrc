@@ -34,7 +34,7 @@ function pi-hole-enable ()
     pi-hole-command enable
 }
 
-function pi-hole-upgrade ()
+function pi-hole-delete-all-pods ()
 {
     kubectl delete -n dns pod $(kubectl get -n dns pod --selector=role=pi-hole -o jsonpath='{.items..metadata.name}')
 }
