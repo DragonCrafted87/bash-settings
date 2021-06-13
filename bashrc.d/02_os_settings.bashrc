@@ -2,7 +2,7 @@
 
 case "$OSTYPE" in
 
-    linux)
+    linux*)
         echo 'Linux'
     ;;
 

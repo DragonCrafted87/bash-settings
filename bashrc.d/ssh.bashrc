@@ -1,34 +1,43 @@
 #!/bin/bash
 
-if [ -z $GIT ] ; then
-  return
-fi
+case "$HOSTNAME" in
 
-# Start SSH Agent
-#----------------------------
+    *media*|*node*)
+        echo 'Skipping SSH Setup'
+    ;;
 
-SSH_ENV="$HOME/.ssh/environment"
 
-function run_ssh_env {
-  . "${SSH_ENV}" > /dev/null
-}
+    # Add here more strings to compare
+    # See correspondence table at the bottom of this answer
 
-function start_ssh_agent {
-  echo "Initializing new SSH agent..."
-  ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-  echo "succeeded"
-  chmod 600 "${SSH_ENV}"
+    *)
+        # Start SSH Agent
+        #----------------------------
 
-  run_ssh_env;
+        SSH_ENV="$HOME/.ssh/environment"
 
-  ssh-add $HOME/.ssh/id_*;
-}
+        function run_ssh_env {
+            . "${SSH_ENV}" > /dev/null
+        }
 
-if [ -f "${SSH_ENV}" ]; then
-  run_ssh_env;
-  ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
-    start_ssh_agent;
-  }
-else
-  start_ssh_agent;
-fi
+        function start_ssh_agent {
+            echo "Initializing new SSH agent..."
+            ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+            echo "succeeded"
+            chmod 600 "${SSH_ENV}"
+
+            run_ssh_env;
+
+            ssh-add $HOME/.ssh/id_*;
+        }
+
+        if [ -f "${SSH_ENV}" ]; then
+            run_ssh_env;
+            ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+                start_ssh_agent;
+            }
+        else
+            start_ssh_agent;
+        fi
+    ;;
+esac
