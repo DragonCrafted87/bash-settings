@@ -3,6 +3,7 @@
 return
 
 sudo apt install git curl ssh
+git config --global pull.rebase false
 
 #ssh keys
 curl -0 https://github.com/dragoncrafted87.keys > .ssh/authorized_keys
