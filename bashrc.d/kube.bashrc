@@ -16,6 +16,7 @@ function k8s-show-all ()
 
 function k8s-copy-cifs-secret-to-namespace ()
 {
+    # shellcheck disable=SC2140 # it got confused by the namespace regex
     kubectl get secret cifs-secret -n storage -o yaml | sed s/"namespace: storage"/"namespace: $1"/ | kubectl apply -f -
 }
 

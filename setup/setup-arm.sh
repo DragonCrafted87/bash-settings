@@ -1,3 +1,6 @@
+#!/bin/bash
+# shellcheck disable=SC2086,SC2093,SC2016,SC2094,SC2164
+
 return
 
 #ssh keys

@@ -43,3 +43,8 @@ function git-update-submodules ()
 {
     git submodule update --init --recursive
 }
+
+function git-check-all-files ()
+{
+    pre-commit run --all-files
+}

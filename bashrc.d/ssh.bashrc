@@ -17,6 +17,7 @@ case "$HOSTNAME" in
         SSH_ENV="$HOME/.ssh/environment"
 
         function run_ssh_env {
+            # shellcheck disable=SC1090
             . "${SSH_ENV}" > /dev/null
         }
 
@@ -28,12 +29,13 @@ case "$HOSTNAME" in
 
             run_ssh_env;
 
-            ssh-add $HOME/.ssh/id_*;
+            ssh-add "$HOME"/.ssh/id_*;
         }
 
         if [ -f "${SSH_ENV}" ]; then
             run_ssh_env;
-            ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+            # shellcheck disable=SC2009
+            ps -ef | grep "${SSH_AGENT_PID}" | grep ssh-agent$ > /dev/null || {
                 start_ssh_agent;
             }
         else

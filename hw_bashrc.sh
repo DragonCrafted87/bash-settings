@@ -1,13 +1,17 @@
+#!/bin/bash
+
 for file in ~/.bashrc.d/*.bashrc;
 do
-source "$file"
+    # shellcheck disable=SC1090
+    source "$file"
 done
 
 function update-bash-settings ()
 {
-  saved_working_dir=$PWD
-  cd ~/bash-settings
-  git pull
-  source ~/.bashrc
-  cd $saved_working_dir
+    saved_working_dir="$PWD"
+    cd ~/bash-settings || return
+    git pull
+    # shellcheck disable=SC1090
+    source ~/.bashrc
+    cd "$saved_working_dir" || return
 }

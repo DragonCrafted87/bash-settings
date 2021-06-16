@@ -2,9 +2,11 @@
 
 alias pylint=pylint_runner
 
+case "$OSTYPE" in
+    win*|msys*)
+        alias pip='python -m pip'
+        ;;
 
-if [ -z $GIT_BASH ] ; then
-    return
-fi
-
-alias pip='python -m pip'
+    *)
+        ;;
+esac

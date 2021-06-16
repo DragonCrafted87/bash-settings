@@ -1,6 +1,9 @@
+#!/bin/bash
+
 for file in ~/.bashrc.d/*.bashrc;
 do
-source "$file"
+    # shellcheck disable=SC1090
+    source "$file"
 done
 
 if ! pgrep -x "x11vnc" > /dev/null

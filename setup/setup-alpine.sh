@@ -1,4 +1,7 @@
 #!/bin/ash
+# shellcheck disable=SC2187,SC2016,SC2094,SC2164
+
+return
 # apk add nano sudo git curl
 # git clone https://github.com/DragonCrafted87/bash-settings.git
 # sudo nano /etc/passwd

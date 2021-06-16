@@ -1,7 +1,10 @@
 #!/bin/bash
-export GIT_BASH=true
 
-for file in $HOME/bash-settings/bashrc.d/*.bashrc;
+GIT_BASH=true
+export GIT_BASH
+
+for file in "$HOME"/bash-settings/bashrc.d/*.bashrc;
 do
-source "$file"
+    # shellcheck disable=SC1090
+    source "$file"
 done

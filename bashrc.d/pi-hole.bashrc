@@ -15,7 +15,7 @@ function pi-hole-command ()
     for element in "${array[@]}"
     do
         echo "$element"
-        kubectl exec -it -n dns "$element" -- pihole $1
+        kubectl exec -it -n dns "$element" -- pihole "$1"
     done
 }
 
@@ -36,5 +36,5 @@ function pi-hole-enable ()
 
 function pi-hole-delete-all-pods ()
 {
-    kubectl delete -n dns pod $(kubectl get -n dns pod --selector=role=pi-hole -o jsonpath='{.items..metadata.name}')
+    kubectl delete -n dns pod "$(kubectl get -n dns pod --selector=role=pi-hole -o jsonpath='{.items..metadata.name}')"
 }

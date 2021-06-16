@@ -1,7 +1,9 @@
 #!/bin/bash
+# shellcheck disable=SC2016
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
+    # shellcheck disable=SC2015
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto -lah --block-size=M '
 
@@ -45,7 +47,7 @@ function base_find ()
     COMMAND=$COMMAND$GREP_COMMAND
     COMMAND=$COMMAND$2
     COMMAND=$COMMAND$FIND_END
-    eval $COMMAND
+    eval "$COMMAND"
 }
 
 function f ()
@@ -67,7 +69,7 @@ function ffile ()
 {
     COMMAND='find ${PWD} -name "*.h*" -o -name "*.c*" -o -name "*.ui" | grep --color=always -s -n '
     COMMAND=$COMMAND$1
-    eval $COMMAND
+    eval "$COMMAND"
 }
 
 function fheader ()

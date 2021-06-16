@@ -1,3 +1,5 @@
+#!/bin/bash
+
 return
 
 git clone git@github.com:DragonCrafted87/bash-settings.git

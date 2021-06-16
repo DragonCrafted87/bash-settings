@@ -2,8 +2,8 @@
 
 function ue-update-project-file ()
 {
-    saved_dir=$PWD
-    cd ~/repos
+    saved_dir="$PWD"
+    cd ~/repos || return
     sed '/FilesU/q' server.prj > /tmp/server.prj
 
     i=0
@@ -14,5 +14,5 @@ function ue-update-project-file ()
         ((i++))
     done
     mv /tmp/server.prj .
-    cd $saved_dir
+    cd "$saved_dir" || return
 }

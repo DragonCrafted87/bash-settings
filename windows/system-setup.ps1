@@ -1,4 +1,4 @@
-﻿[Environment]::SetEnvironmentVariable(
+[Environment]::SetEnvironmentVariable(
     "Path",
     "D:\Applications\Local Binaries;" + [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User),
     [EnvironmentVariableTarget]::User)

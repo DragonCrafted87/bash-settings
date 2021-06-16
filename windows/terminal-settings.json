@@ -3,23 +3,13 @@
     "copyFormatting": "none",
     "copyOnSelect": true,
     "defaultProfile": "{00000000-0000-0000-ba54-000000000002}",
-    // Add custom keybindings to this array.
-    // To unbind a key combination from your defaults.json, set the command to "unbound".
-    // To learn more about keybindings, visit https://aka.ms/terminal-keybindings
-    "keybindings":
-    [
-        // Press Ctrl+Shift+F to open the search box
+    "keybindings": [
         {
             "command": "find",
             "keys": "ctrl+shift+f"
         },
-        // Press Alt+Shift+D to open a new pane.
-        // - "split": "auto" makes this pane open in the direction that provides the most surface area.
-        // - "splitMode": "duplicate" makes the new pane use the focused pane's profile.
-        // To learn more about panes, visit https://aka.ms/terminal-panes
         {
-            "command":
-            {
+            "command": {
                 "action": "splitPane",
                 "split": "auto",
                 "splitMode": "duplicate"
@@ -28,15 +18,11 @@
         }
     ],
     "multiLinePasteWarning": false,
-    "profiles":
-    {
-        "defaults":
-        {
-            // Put settings here that you want to apply to all profiles..
+    "profiles": {
+        "defaults": {
             "colorScheme": "Tango Dark"
         },
-        "list":
-        [
+        "list": [
             {
                 "commandline": "powershell.exe",
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
@@ -73,8 +59,7 @@
             }
         ]
     },
-    "schemes":
-    [
+    "schemes": [
         {
             "background": "#0C0C0C",
             "black": "#0C0C0C",
