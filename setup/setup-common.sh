@@ -38,4 +38,3 @@ sudo snap install microk8s --classic --channel=1.19/stable
 
 #from an active node run then execute the join command
 microk8s add-node
-

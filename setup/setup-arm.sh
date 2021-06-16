@@ -32,6 +32,3 @@ sudo nano /boot/firmware/cmdline.txt
 # insert at start of line: cgroup_enable=memory cgroup_memory=1
 
 sudo reboot
-
-
-

@@ -84,4 +84,3 @@ function fui ()
 {
     base_find 'find ${PWD} -name "*.ui"' "$1"
 }
-

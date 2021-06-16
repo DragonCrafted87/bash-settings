@@ -4,7 +4,7 @@ alias pylint=pylint_runner
 
 
 if [ -z $GIT_BASH ] ; then
-  return
+    return
 fi
 
 alias pip='python -m pip'

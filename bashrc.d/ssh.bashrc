@@ -3,12 +3,12 @@
 case "$HOSTNAME" in
 
     *media*|*node*)
-        echo 'Skipping SSH Setup'
-    ;;
+        [[ -t 1 ]] && echo 'Skipping SSH Setup'
+        ;;
 
 
-    # Add here more strings to compare
-    # See correspondence table at the bottom of this answer
+        # Add here more strings to compare
+        # See correspondence table at the bottom of this answer
 
     *)
         # Start SSH Agent
@@ -39,5 +39,5 @@ case "$HOSTNAME" in
         else
             start_ssh_agent;
         fi
-    ;;
+        ;;
 esac

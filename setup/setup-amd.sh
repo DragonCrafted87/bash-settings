@@ -58,4 +58,3 @@ UUID=3eb0d3d1-c17a-4487-8bb7-95d7070becbb /mnt/enclosure2_drive2 ext4 defaults,n
 UUID=c12da01f-3c77-465d-bdf5-2451d2940afb /mnt/enclosure2_drive3 ext4 defaults,noatime,nofail 0 0
 UUID=302e14eb-1af6-40c7-a7ba-c2548f29b3d6 /mnt/enclosure2_drive4 ext4 defaults,noatime,nofail 0 0
 UUID=e067e8a1-880a-417b-ac2f-0d634dd2e5d4 /mnt/enclosure2_drive5 ext4 defaults,noatime,nofail 0 0
-

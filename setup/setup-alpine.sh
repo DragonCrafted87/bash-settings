@@ -24,4 +24,3 @@ sudo ln -s /home/dragon/.bashrc /root/.bashrc
 sudo ln -s /home/dragon/.bashrc.d/ /root/.bashrc.d
 sudo timedatectl set-timezone America/Chicago
 sudo ln -s /usr/bin/python3 /usr/bin/python
-
