@@ -2,8 +2,6 @@
 
 function ue-update-project-file ()
 {
-
-
   saved_dir=$PWD
   cd ~/repos
   sed '/FilesU/q' server.prj > /tmp/server.prj

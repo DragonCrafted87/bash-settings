@@ -1,4 +1,8 @@
-﻿choco feature enable -n allowGlobalConfirmation
+﻿#!/bin/bash
+
+return
+
+choco feature enable -n allowGlobalConfirmation
 
 #System
 choco install amd-ryzen-chipset
@@ -46,3 +50,6 @@ choco install obs-virtualcam
 
 #Games
 choco install retroarch
+
+#BitTorrent
+choco install transmission
