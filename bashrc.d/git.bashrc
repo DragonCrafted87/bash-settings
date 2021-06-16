@@ -38,3 +38,8 @@ function git-init-all-repos ()
           git init;
           echo "";' \;
 }
+
+function git-update-submodules ()
+{
+    git submodule update --init --recursive
+}
