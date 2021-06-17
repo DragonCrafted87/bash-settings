@@ -17,6 +17,10 @@ choco install 7zip
 choco install python3
 choco install racket
 choco install docker-desktop
+choco install rustup.install
+rustup toolchain install stable-x86_64-pc-windows-gnu
+rustup component add rustfmt
+
 
 #C++ Tooling
 choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'

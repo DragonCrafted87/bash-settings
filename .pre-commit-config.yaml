@@ -17,6 +17,31 @@ repos:
         -   --autofix
         -   --indent
         -   '4'
+-   repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+    rev: v2.1.0
+    hooks:
+    -   id: pretty-format-yaml
+        args:
+        -   --autofix
+        -   --indent
+        -   '4'
+-   repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.6
+    hooks:
+    -   id: mdformat
+        additional_dependencies:
+        -   mdformat-gfm
+        -   mdformat-black
+        args:
+        -   --check
+-   repo: https://github.com/adrienverge/yamllint
+    rev: v1.26.1
+    hooks:
+    -   id: yamllint
+-   repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.27.1
+    hooks:
+    -   id: markdownlint
 -   repo: https://github.com/psf/black
     rev: 21.6b0
     hooks:
@@ -43,15 +68,3 @@ repos:
     rev: v0.7.2.1
     hooks:
     -   id: shellcheck
--   repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.1.0
-    hooks:
-    -   id: pretty-format-yaml
-        args:
-        -   --autofix
-        -   --indent
-        -   '4'
--   repo: https://github.com/adrienverge/yamllint
-    rev: v1.26.1
-    hooks:
-    -   id: yamllint
