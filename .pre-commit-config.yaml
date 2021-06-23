@@ -26,14 +26,15 @@ repos:
         -   --indent
         -   '4'
 -   repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.6
+    rev: 0.7.7
     hooks:
     -   id: mdformat
+        args:
+        -   --end-of-line
+        -   lf
         additional_dependencies:
         -   mdformat-gfm
         -   mdformat-black
-        args:
-        -   --check
 -   repo: https://github.com/adrienverge/yamllint
     rev: v1.26.1
     hooks:
@@ -48,7 +49,7 @@ repos:
     -   id: black
         language_version: python3
 -   repo: https://github.com/pycqa/isort
-    rev: 5.8.0
+    rev: 5.9.1
     hooks:
     -   id: isort
         args:
@@ -56,6 +57,17 @@ repos:
         -   black
         -   --filter-files
         -   --force-single-line-imports
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+    -   id: flake8
+        args:
+        -   --extend-ignore=E203
+        -   --max-line-length=88
+-   repo: https://github.com/PyCQA/pylint
+    rev: v2.8.3
+    hooks:
+    -   id: pylint
 -   repo: https://github.com/lovesegfault/beautysh
     rev: v6.1.0
     hooks:
