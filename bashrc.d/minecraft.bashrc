@@ -28,6 +28,6 @@ function mc-delete-pod ()
 function mc-update-mods ()
 {
     mod_downloader.py \
-        'D:\Games\MultiMC\instances\Fabric_1.17.0\.minecraft\modlist.conf' \
+        'S:\Games\MineCraft\modlist.conf' \
         'D:\Games\MultiMC\instances\Fabric_1.17.0\.minecraft\mods'
 }
