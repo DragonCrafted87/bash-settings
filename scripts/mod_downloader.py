@@ -77,10 +77,17 @@ def curseforge_parse(api_data, minecraft_version):
 
 def github_parse(api_data, minecraft_version):
     for releases in api_data:
-        for assets in releases["assets"]:
-            link = assets.get("browser_download_url")
-            if link is not None and link.endswith("jar") and minecraft_version in link:
-                return (link[link.rfind("/") + 1 :], link)
+        if not bool(
+            releases.get("prerelease", True)
+        ) and minecraft_version in releases.get("name").split(" "):
+            for assets in releases["assets"]:
+                link = assets.get("browser_download_url")
+                if (
+                    link is not None
+                    and link.endswith("jar")
+                    and minecraft_version in link
+                ):
+                    return (link[link.rfind("/") + 1 :], link)
     return None
 
 
