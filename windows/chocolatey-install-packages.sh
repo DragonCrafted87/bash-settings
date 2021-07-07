@@ -39,6 +39,7 @@ choco install foxitreader --ia '/MERGETASKS="!desktopicon /COMPONENTS=*pdfviewer
 choco install microsoft-office-deployment --params '/64bit  /Product:O365HomePremRetail  /Exclude=Publisher,Lync,Groove,Access'
 choco install authy-desktop
 choco install speedtest
+choco install makemkv
 
 #Content Creation
 choco install ffmpeg-full
