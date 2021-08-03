@@ -27,7 +27,11 @@ function mc-delete-pod ()
 
 function mc-update-mods ()
 {
+    export MINECRAFT_VERSION='1.17.1'
+
     mod_downloader.py \
         'S:\Games\MineCraft\modlist.conf' \
         'D:\Games\MultiMC\instances\Fabric_1.17.0\.minecraft\mods'
+
+    unset MINECRAFT_VERSION
 }
