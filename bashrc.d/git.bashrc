@@ -31,6 +31,14 @@ function git-pull-all-repos ()
     echo "";' -- {} \;
 }
 
+function git-push-all-repos ()
+{
+    find . -maxdepth 2 -name .git -type d -execdir sh -c '
+           basename -s .git `git config --get remote.origin.url`;
+           git push;
+    echo "";' -- {} \;
+}
+
 function git-init-all-repos ()
 {
     find . -maxdepth 2 -name .git -type d -execdir sh -c '

@@ -5,12 +5,12 @@ function mc-command ()
     kubectl exec -it -n games "$(kubectl get -n games pod --selector=role=minecraft -o jsonpath='{.items..metadata.name}')" -- "$@"
 }
 
-function mc-status ()
+function mc-logs ()
 {
     kubectl logs -n games "$(kubectl get -n games pod --selector=role=minecraft -o jsonpath='{.items..metadata.name}')" -f
 }
 
-function mc-show ()
+function mc-describe ()
 {
     kubectl describe -n games pod "$(kubectl get -n games pod --selector=role=minecraft -o jsonpath='{.items..metadata.name}')"
 }
@@ -27,7 +27,11 @@ function mc-delete-pod ()
 
 function mc-update-mods ()
 {
+    export MINECRAFT_VERSION='1.17.1'
+
     mod_downloader.py \
         'S:\Games\MineCraft\modlist.conf' \
         'D:\Games\MultiMC\instances\Fabric_1.17.0\.minecraft\mods'
+
+    unset MINECRAFT_VERSION
 }

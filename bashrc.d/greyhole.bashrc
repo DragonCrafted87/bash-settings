@@ -2,7 +2,20 @@
 
 function gh-command ()
 {
-    kubectl exec -it -n storage "$(kubectl get -n storage pod --selector=role=greyhole -o jsonpath='{.items..metadata.name}')" -- "$@"
+    kubectl exec -it -n storage \
+        "$(kubectl get -n storage pod --selector=role=greyhole -o jsonpath='{.items..metadata.name}')" \
+        --container greyhole \
+        -- \
+        "$@"
+}
+
+function gh-command-database ()
+{
+    kubectl exec -it -n storage \
+        "$(kubectl get -n storage pod --selector=role=greyhole -o jsonpath='{.items..metadata.name}')" \
+        --container mysql \
+        -- \
+        "$@"
 }
 
 function gh-status ()
@@ -12,7 +25,15 @@ function gh-status ()
     gh-command greyhole --status
 }
 
+function gh-logs ()
+{
+    kubectl logs -n storage \
+        "$(kubectl get -n storage pod --selector=role=greyhole -o jsonpath='{.items..metadata.name}')" \
+        --container greyhole
+}
+
 function gh-delete-pod ()
 {
-    kubectl delete -n storage pod "$(kubectl get -n storage pod --selector=role=greyhole -o jsonpath='{.items..metadata.name}')"
+    kubectl delete -n storage pod \
+        "$(kubectl get -n storage pod --selector=role=greyhole -o jsonpath='{.items..metadata.name}')"
 }
