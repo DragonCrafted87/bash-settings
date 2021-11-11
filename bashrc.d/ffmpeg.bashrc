@@ -212,6 +212,7 @@ function ffmpeg-video-crop-encode ()
     mkdir -p "original"
 
     video_codec="h264"
+    audio_codec="flac"
 
     filename=$(basename "$1")
     filename="${filename%.*}"
@@ -220,7 +221,7 @@ function ffmpeg-video-crop-encode ()
 
     ffmpeg -y -i "$1" \
         -vf crop="$2" \
-        -acodec copy \
+        -acodec $audio_codec \
         -vcodec $video_codec \
         -scodec copy \
         "$output_file_name"
