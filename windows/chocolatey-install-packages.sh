@@ -26,7 +26,7 @@ rustup component add rustfmt
 choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
 choco install ninja
 #clan gcc llvm ....
-choco install winlibs
+choco uninstall winlibs
 
 #Java
 choco install AdoptOpenJDK --params="/ADDLOCAL=FeatureMain,FeatureEnvironment,FeatureJarFileRunWith,FeatureJavaHome /INSTALLDIR=C:\Program Files\AdoptOpenJDK\ /quiet"

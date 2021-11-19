@@ -7,6 +7,14 @@ case "$OSTYPE" in
         return
         ;;
 esac
+USER=whoami
+
+BASE_PATH=$PATH
+PATH=$PATH:"/c/Program Files/cppcheck"
+PATH=$PATH:/c/users/$USER/scoop/shims
+PATH=$PATH:/c/users/$USER/scoop/apps/winlibs-mingw-llvm-ucrt/current/bin
+PATH=$PATH:$BASE_PATH
+export PATH
 
 function windows-clear-icon-cache ()
 {
