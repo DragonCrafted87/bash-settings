@@ -26,11 +26,15 @@ function docker-stop ()
     docker stop "$(docker ps -a -q)"
 }
 
+function docker-remove-all-stopped-containers ()
+{
+    docker container prune --force
+}
+
 function docker-remove-all-images ()
 {
-    #delete containers
-    docker rm -f "$(docker ps -a -q)"
+    docker-remove-all-stopped-containers
 
     #delete images
-    docker rmi -f "$(docker images -q)"
+    docker system prune --all --force
 }
