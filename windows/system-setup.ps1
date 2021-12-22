@@ -38,3 +38,23 @@ Remove-ItemProperty -path HKCU:\Software\Microsoft\Windows\CurrentVersion\Explor
 reg import "D:\git-home\bash-settings\windows\taskbar-desktop.reg"
 taskkill /f /im explorer.exe
 start explorer.exe
+
+
+
+pacman -Syu
+pacman -Su
+pacman -S \
+    --needed \
+    base-devel \
+    python-pip \
+    git \
+    mingw-w64-clang-x86_64-boost\
+    mingw-w64-clang-x86_64-cmake \
+    mingw-w64-clang-x86_64-cppcheck \
+    mingw-w64-clang-x86_64-ninja \
+    mingw-w64-clang-x86_64-toolchain \
+    mingw-w64-clang-x86_64-ffmpeg \
+
+pip install pre-commit
+pacman -S msys2-devel
+pacman -S clang

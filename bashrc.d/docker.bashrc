@@ -5,17 +5,15 @@ export FORMAT="\nID\t{{.ID}}\nIMAGE\t{{.Image}}\nCOMMAND\t{{.Command}}\nCREATED\
 function docker-build ()
 {
     docker build \
-        --no-cache \
-        --pull \
         --file Dockerfile \
         --tag "$1" \
         .
 }
 
-function docker-build-local ()
+function docker-build-squash ()
 {
     docker build \
-        --no-cache \
+        --squash \
         --file Dockerfile \
         --tag "$1" \
         .
