@@ -40,7 +40,11 @@ function windows-clear-thumbnail-cache ()
     cd "$saved_dir" || return
 }
 
-
+function msys-setup ()
+{
+    grep "^${USERNAME}:" /etc/passwd >/dev/null 2>&1 || mkpasswd | grep "^${USERNAME}:" >> /etc/passwd
+    nano /etc/passwd
+}
 
 
 function msys-update ()
