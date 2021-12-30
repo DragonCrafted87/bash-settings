@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
 from argparse import ArgumentParser
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed as futures_as_completed
@@ -9,6 +8,9 @@ from os import makedirs
 from os import rename
 from shutil import rmtree as rmdir
 from subprocess import run
+
+ENCODING_WORKERS = 8
+MAIN_WORKERS = 2
 
 
 def run_process(args, debug=False):
@@ -79,9 +81,9 @@ def video_crop_encode(input_filename, output_filename):
 
 def encode_all_files():
 
-    with ThreadPoolExecutor(max_workers=8) as executor:
+    with ThreadPoolExecutor(max_workers=ENCODING_WORKERS) as executor:
 
-        file_list = glob("*.*")
+        file_list = glob("*.mkv")
         futures = []
         for file_name in file_list:
             input_filename = file_name
@@ -144,7 +146,7 @@ def dvd_split_encode(input_filename, base_filename, folder_name):
     chapter_breakpoints = dvd_get_chapter_timestamps(input_filename)
     output_filename_list = []
 
-    with ThreadPoolExecutor(max_workers=8) as executor:
+    with ThreadPoolExecutor(max_workers=ENCODING_WORKERS) as executor:
 
         futures = []
         pad_count = len(str(len(chapter_breakpoints) - 1))
@@ -259,9 +261,20 @@ def main():
 
     elif args.command == "make-dvd":
         if not args.input_filename:
-            print("input_filename must be specified with make-dvd")
-            sys.exit(status=1)
-        create_dvd(args.input_filename)
+            with ThreadPoolExecutor(max_workers=MAIN_WORKERS) as executor:
+
+                file_list = glob("*.mkv")
+                futures = []
+                for file_name in file_list:
+                    futures.append(executor.submit(create_dvd, file_name))
+
+                print("Encoding", len(futures), "files.")
+
+                for idx, future in enumerate(futures_as_completed(futures)):
+                    res = future.result()
+                    print("Processed job", idx, "result", res)
+        else:
+            create_dvd(args.input_filename)
 
 
 if __name__ == "__main__":
