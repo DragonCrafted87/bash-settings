@@ -15,6 +15,7 @@ export CXX=/bin/clang++
 alias python=/bin/python.exe
 
 BASE_PATH=$PATH
+PATH="/d/git-home/bin"
 PATH=$PATH:$BASE_PATH
 PATH="$PATH:/c/Program Files/nodejs"
 PATH="$PATH:/c/Program Files/Docker/Docker/resources/bin/"
@@ -58,7 +59,8 @@ function msys-install-base-packages ()
         mingw-w64-clang-x86_64-boost\
         mingw-w64-clang-x86_64-cmake \
         mingw-w64-clang-x86_64-cppcheck \
+        mingw-w64-clang-x86_64-ffmpeg \
         mingw-w64-clang-x86_64-ninja \
-        mingw-w64-clang-x86_64-toolchain \
-        mingw-w64-clang-x86_64-ffmpeg
+        mingw-w64-clang-x86_64-python-pip \
+        mingw-w64-clang-x86_64-toolchain
 }

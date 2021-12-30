@@ -107,8 +107,11 @@ function ffmpeg-video-split-by-timestamps ()
 
             ffmpeg -y -i "$1" \
                 -ss ${!j} -to "${!i}" \
-                -acodec $audio_codec \
+                -map 0:v \
                 -vcodec $video_codec \
+                -map 0:a \
+                -acodec $audio_codec \
+                -map 0:s \
                 -scodec $subtitle_codec \
                 "$output_file_name" &
 
@@ -127,9 +130,12 @@ function ffmpeg-video-split-by-timestamps ()
 
         ffmpeg -y -i "$1" \
             -ss "$2" -to "$end_time" \
-            -acodec $audio_codec \
+            -map 0:v \
             -vcodec $video_codec \
-            -scodec copy \
+            -map 0:a \
+            -acodec $audio_codec \
+            -map 0:s \
+            -scodec $subtitle_codec \
             "$output_file_name" &
     fi
     wait
@@ -143,17 +149,13 @@ function ffmpeg-video-split-by-chapters ()
         exit 1
     fi
 
-    filename=$(basename "$file")
-    filename="${filename%.*}"
-
     # shellcheck disable=SC2207 # Don't want to rework it yet
-    timestamp_list=($(ffprobe -i "$filename.mkv" -show_chapters -loglevel error | grep end_time | cut -d '=' -f 2 ))
+    timestamp_list=($(ffprobe -i "$file" -show_chapters -loglevel error | grep end_time | cut -d '=' -f 2 ))
 
-    ffmpeg_command="ffmpeg-split-video $filename 0.00 "
+    ffmpeg_command="ffmpeg-video-split-by-timestamps $file 0.00 "
     for i in "${timestamp_list[@]}";
     do
         ffmpeg_command=$ffmpeg_command"$i "
-
     done
 
     echo "$ffmpeg_command"
@@ -201,32 +203,10 @@ function ffmpeg-get-end-timestamp ()
     echo "$end_timestamp"
 }
 
-function ffmpeg-video-crop-detection ()
-{
-    ffmpeg -i "$1" -vf cropdetect -f null -
-}
 
 function ffmpeg-video-crop-encode ()
 {
-    mkdir -p "cropped"
-    mkdir -p "original"
-
-    video_codec="h264"
-    audio_codec="flac"
-
-    filename=$(basename "$1")
-    filename="${filename%.*}"
-    filename="$filename.mkv"
-    output_file_name="cropped/$filename"
-
-    ffmpeg -y -i "$1" \
-        -vf crop="$2" \
-        -acodec $audio_codec \
-        -vcodec $video_codec \
-        -scodec copy \
-        "$output_file_name"
-
-    mv "$1" "original/$1"
+    /clang64/bin/python3.exe -I ~/bash-settings/scripts/ffmpeg.py encode
 }
 
 #ffmpeg-split-video Pokemon_Master_Quest_D1_t00 00:00:00 00:41:09 01:20:41
