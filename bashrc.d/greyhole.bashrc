@@ -18,11 +18,21 @@ function gh-command-database ()
         "$@"
 }
 
-function gh-status ()
+function gh-queue ()
 {
     gh-command greyhole --view-queue
+}
+
+function gh-status ()
+{
+    gh-queue
     gh-command greyhole --stats
     gh-command greyhole --status
+}
+
+function gh-spool ()
+{
+    gh-command greyhole --process-spool --keepalive
 }
 
 function gh-logs ()
@@ -30,6 +40,12 @@ function gh-logs ()
     kubectl logs -n storage \
         "$(kubectl get -n storage pod --selector=role=greyhole -o jsonpath='{.items..metadata.name}')" \
         --container greyhole
+}
+
+function gh-activity-logs ()
+{
+    gh-command greyhole --status
+    gh-command greyhole --logs
 }
 
 function gh-delete-pod ()

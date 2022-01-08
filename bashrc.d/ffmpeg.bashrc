@@ -1,52 +1,5 @@
 #!/bin/bash
 
-function ffmpeg-video-encode ()
-{
-    mkdir -p "encoded"
-    mkdir -p "original"
-
-    video_codec="h264"
-    audio_codec="flac"
-
-    filename=$(basename "$1")
-    filename="${filename%.*}"
-    filename="$filename.mkv"
-    output_file_name="encoded/$filename"
-
-    ffmpeg -y -i "$1" \
-        -acodec $audio_codec \
-        -vcodec $video_codec \
-        -scodec copy \
-        "$output_file_name"
-
-    mv "$1" "original/$1"
-
-}
-
-function ffmpeg-video-folder-transcode ()
-{
-    extension="$1"
-
-    if [[ "$2" =~ ^[0-9]+$ ]] ; then
-        num_to_encode_at_once=$2
-    else
-        num_to_encode_at_once=1
-    fi
-
-    k=1
-    for f in *."$extension"
-    do
-        ffmpeg-video-encode "$f" &
-
-        if [[ $((k%num_to_encode_at_once)) -eq 0 ]]; then
-            wait
-        fi
-
-        k=$((k+1))
-    done
-    wait
-}
-
 function ffmpeg-concatenate-videos ()
 {
     file_list_file=$(mktemp ./ffmpeg_file_list.XXXXXXXXX)
@@ -79,6 +32,12 @@ function ffmpeg-concatenate-videos ()
 
 function ffmpeg-video-split-by-timestamps ()
 {
+    file="$1"
+    if [ -z "$file" ]; then
+        echo "Missing file argument!"
+        exit 1
+    fi
+
     #    video_codec="$(ffprobe -loglevel error -select_streams v:0 -show_entries stream=codec_name -of default=nk=1:nw=1 "$1.mkv")"
     #    audio_codec="$(ffprobe -loglevel error -select_streams a:0 -show_entries stream=codec_name -of default=nk=1:nw=1 "$1.mkv")"
     #    subtitle_codec="$(ffprobe -loglevel error -select_streams s:0 -show_entries stream=codec_name -of default=nk=1:nw=1 "$1.mkv")"
@@ -124,12 +83,12 @@ function ffmpeg-video-split-by-timestamps ()
         done
     else
         output_file_name=$filename"_split_001.mkv"
-        end_time=$(ffmpeg-get-end-timestamp "$1")
+        end_timestamp=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$file")
 
-        echo "$end_time"
+        echo "$end_timestamp"
 
         ffmpeg -y -i "$1" \
-            -ss "$2" -to "$end_time" \
+            -ss "$2" -to "$end_timestamp" \
             -map 0:v \
             -vcodec $video_codec \
             -map 0:a \
@@ -188,25 +147,22 @@ function ffmpeg-video-merge-chapters ()
 
 }
 
-function ffmpeg-get-end-timestamp ()
-{
-    file="$1"
-    if [ -z "$file" ]; then
-        echo "Missing file argument!"
-        exit 1
-    fi
-
-    filename=$(basename "$file")
-    filename="${filename%.*}"
-
-    end_timestamp=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$filename.mkv")
-    echo "$end_timestamp"
-}
-
-
 function ffmpeg-video-crop-encode ()
 {
-    /clang64/bin/python3.exe -I ~/bash-settings/scripts/ffmpeg.py encode
+    if [ -z "$1" ]; then
+        /clang64/bin/python3.exe -I ~/bash-settings/scripts/ffmpeg.py encode
+    else
+        /clang64/bin/python3.exe -I ~/bash-settings/scripts/ffmpeg.py encode --input_filename="$1"
+    fi
+}
+
+function ffmpeg-video-make-dvd ()
+{
+    if [ -z "$1" ]; then
+        /clang64/bin/python3.exe -I ~/bash-settings/scripts/ffmpeg.py make-dvd
+    else
+        /clang64/bin/python3.exe -I ~/bash-settings/scripts/ffmpeg.py make-dvd --input_filename="$1"
+    fi
 }
 
 #ffmpeg-split-video Pokemon_Master_Quest_D1_t00 00:00:00 00:41:09 01:20:41

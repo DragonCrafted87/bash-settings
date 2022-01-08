@@ -10,7 +10,13 @@ from shutil import rmtree as rmdir
 from subprocess import run
 
 ENCODING_WORKERS = 8
-MAIN_WORKERS = 2
+MAIN_WORKERS = 4
+
+ENCODING_EXECUTOR = ThreadPoolExecutor(max_workers=ENCODING_WORKERS)
+
+
+def get_encoding_executor():
+    return ENCODING_EXECUTOR
 
 
 def run_process(args, debug=False):
@@ -81,23 +87,23 @@ def video_crop_encode(input_filename, output_filename):
 
 def encode_all_files():
 
-    with ThreadPoolExecutor(max_workers=ENCODING_WORKERS) as executor:
+    executor = get_encoding_executor()
+    futures = []
 
-        file_list = glob("*.mkv")
-        futures = []
-        for file_name in file_list:
-            input_filename = file_name
-            output_filename = file_name.rsplit(".", 1)[0] + ".mkv"
+    file_list = glob("*.mkv")
+    for file_name in file_list:
+        input_filename = file_name
+        output_filename = file_name.rsplit(".", 1)[0] + ".mkv"
 
-            futures.append(
-                executor.submit(video_crop_encode, input_filename, output_filename)
-            )
+        futures.append(
+            executor.submit(video_crop_encode, input_filename, output_filename)
+        )
 
-        print("Encoding", len(futures), "files.")
+    print("Encoding", len(futures), "files.")
 
-        for idx, future in enumerate(futures_as_completed(futures)):
-            res = future.result()
-            print("Processed job", idx, "result", res)
+    for idx, future in enumerate(futures_as_completed(futures)):
+        res = future.result()
+        print("Processed job", idx, "result", res)
 
 
 def dvd_encode(input_filename, output_filename, folder_name, start_time, end_time):
@@ -146,35 +152,35 @@ def dvd_split_encode(input_filename, base_filename, folder_name):
     chapter_breakpoints = dvd_get_chapter_timestamps(input_filename)
     output_filename_list = []
 
-    with ThreadPoolExecutor(max_workers=ENCODING_WORKERS) as executor:
+    executor = get_encoding_executor()
+    futures = []
 
-        futures = []
-        pad_count = len(str(len(chapter_breakpoints) - 1))
-        for index in range(len(chapter_breakpoints) - 1):
-            output_filename = (
-                base_filename + "_" + str(index).rjust(pad_count, "0") + ".mpg"
+    pad_count = len(str(len(chapter_breakpoints) - 1))
+    for index in range(len(chapter_breakpoints) - 1):
+        output_filename = (
+            base_filename + "_" + str(index).rjust(pad_count, "0") + ".mpg"
+        )
+        output_filename_list.append(output_filename)
+
+        start_time = chapter_breakpoints[index]
+        end_time = chapter_breakpoints[index + 1]
+
+        futures.append(
+            executor.submit(
+                dvd_encode,
+                input_filename,
+                output_filename,
+                folder_name,
+                start_time,
+                end_time,
             )
-            output_filename_list.append(output_filename)
+        )
 
-            start_time = chapter_breakpoints[index]
-            end_time = chapter_breakpoints[index + 1]
+    print("Encoding", len(futures), "files.")
 
-            futures.append(
-                executor.submit(
-                    dvd_encode,
-                    input_filename,
-                    output_filename,
-                    folder_name,
-                    start_time,
-                    end_time,
-                )
-            )
-
-        print("Encoding", len(futures), "files.")
-
-        for idx, future in enumerate(futures_as_completed(futures)):
-            res = future.result()
-            print("Processed job", idx, "result", res)
+    for idx, future in enumerate(futures_as_completed(futures)):
+        res = future.result()
+        print("Processed job", idx, "result", res)
 
     return output_filename_list
 
@@ -213,17 +219,19 @@ def dvd_author_disk(folder_name, filename_list):
 
 def dvd_make_iso(base_filename, folder_name):
 
+    iso_name = f"{base_filename}.iso"
     process_args = [
         "mkisofs",
         "-dvd-video",
         "-volid",
         base_filename,
         "-o",
-        f"{base_filename}.iso",
+        iso_name,
         f"{folder_name}/dvd",
     ]
 
     run_process(process_args)
+    return iso_name
 
 
 def create_dvd(input_filename):
@@ -236,9 +244,11 @@ def create_dvd(input_filename):
 
     file_name_list = dvd_split_encode(input_filename, base_filename, folder_name)
     dvd_author_disk(folder_name, file_name_list)
-    dvd_make_iso(base_filename, folder_name)
+    iso_name = dvd_make_iso(base_filename, folder_name)
 
     rmdir(f"{folder_name}")
+
+    return iso_name
 
 
 def main():
@@ -268,7 +278,7 @@ def main():
                 for file_name in file_list:
                     futures.append(executor.submit(create_dvd, file_name))
 
-                print("Encoding", len(futures), "files.")
+                print("Creating", len(futures), "dvds.")
 
                 for idx, future in enumerate(futures_as_completed(futures)):
                     res = future.result()
