@@ -1,12 +1,7 @@
-#!python
 # -*- coding: utf-8 -*-
 
-
 from argparse import ArgumentParser
-
-# System Imports
 from glob import glob
-from os import getenv
 from os import mkdir
 from os import remove as delete_file
 from pathlib import PurePath
@@ -15,9 +10,7 @@ from re import search
 from sys import exit as sys_exit
 from urllib.parse import quote
 
-# Local Imports
-# https://docs.python-requests.org/en/master/
-# pylint can't find requests for whatever reason even though its installed and works
+from dateutil.parser import parse as parse_date  # pylint: disable=import-error
 from requests import get as http_get  # pylint: disable=import-error
 
 
@@ -60,18 +53,31 @@ def curseforge_parse(api_data, minecraft_version):
         )
         return (api_data["download"]["name"], url)
 
+    selected_item = None
+    mod_upload = parse_date("2000-01-01T00:00:00.000Z")
+
     for item in api_data["files"]:
-        if minecraft_version in item["versions"] and "Fabric" in item["versions"]:
-            base_id = item["url"][item["url"].rfind("/") + 1 :]
-            url = (
-                "https://media.forgecdn.net/files/"
-                + str(int(base_id[0:4]))
-                + "/"
-                + str(int(base_id[4:7]))
-                + "/"
-                + quote(item["name"])
-            )
-            return (item["name"], url)
+        new_mod_upload = parse_date(item["uploaded_at"])
+
+        if (
+            minecraft_version in item["versions"]
+            and "Fabric" in item["versions"]
+            and mod_upload < new_mod_upload
+        ):
+            mod_upload = new_mod_upload
+            selected_item = item
+
+    if selected_item:
+        base_id = selected_item["url"][selected_item["url"].rfind("/") + 1 :]
+        url = (
+            "https://media.forgecdn.net/files/"
+            + str(int(base_id[0:4]))
+            + "/"
+            + str(int(base_id[4:7]))
+            + "/"
+            + quote(selected_item["name"])
+        )
+        return (selected_item["name"], url)
     return None
 
 
@@ -88,6 +94,18 @@ def github_parse(api_data, minecraft_version):
                     and minecraft_version in link
                 ):
                     return (link[link.rfind("/") + 1 :], link)
+
+    for releases in api_data:
+        if not bool(releases.get("prerelease", True)):
+            for assets in releases["assets"]:
+                link = assets.get("browser_download_url")
+                if (
+                    link is not None
+                    and link.endswith("jar")
+                    and minecraft_version in link
+                ):
+                    return (link[link.rfind("/") + 1 :], link)
+
     return None
 
 
@@ -128,19 +146,25 @@ def main():
     argument_parser = ArgumentParser()
     argument_parser.add_argument("mod_list_path")
     argument_parser.add_argument("mods_folder")
+    argument_parser.add_argument("mc_version")
+
     args = argument_parser.parse_args()
 
     if args.mod_list_path is None:
         pprint("Mod List Not Found")
         sys_exit()
 
-    with open(f"{args.mod_list_path}", "r") as mod_list_file:
+    if args.mc_version is None:
+        pprint("Minecraft Version Not Found")
+        sys_exit()
+
+    with open(f"{args.mod_list_path}", "r", encoding="utf8") as mod_list_file:
         mod_list = [line.strip() for line in mod_list_file.readlines()]
 
     mod_list = list(filter(lambda x: x, mod_list))
     mod_list = list(filter(lambda x: not x.startswith("#"), mod_list))
 
-    minecraft_version = getenv("MINECRAFT_VERSION", "1.17")
+    minecraft_version = args.mc_version
     secondary_version = None
 
     if minecraft_version.count(".") == 2:

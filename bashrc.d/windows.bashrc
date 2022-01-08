@@ -67,4 +67,7 @@ function msys-install-base-packages ()
         mingw-w64-clang-x86_64-ninja \
         mingw-w64-clang-x86_64-python-pip \
         mingw-w64-clang-x86_64-toolchain
+
+    /clang64/bin/pip.exe install wheel
+    /clang64/bin/pip.exe install requests python-dateutil
 }
