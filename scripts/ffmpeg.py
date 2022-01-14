@@ -71,7 +71,7 @@ def video_crop_encode(input_filename, output_filename):
         "-acodec",
         "flac",
         "-map",
-        "0:s",
+        "0:s?",
         "-scodec",
         "copy",
         f"cropped/{output_filename}",
