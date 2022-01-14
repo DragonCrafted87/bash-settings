@@ -36,7 +36,7 @@ function mc-update-mods ()
     /clang64/bin/python3.exe -I \
         ~/bash-settings/scripts/mod_downloader.py \
         'S:\Games\MineCraft\modlist.conf' \
-        'D:\Games\MultiMC\instances\Fabric_1.17.0\.minecraft\mods' \
+        'D:\Games\MultiMC\instances\Fabric_Primary\.minecraft\mods' \
         "$MINECRAFT_VERSION"
 
 }
