@@ -11,6 +11,9 @@ BANNED_FILE_SUBSTRINGS = [
 BANNED_GROUP_SUBSTRINGS = [
     ".git ",
     ".kube",
+    ".cache",
+    ".gnupg",
+    ".local",
     ".dvdcss",
     ".dbus_keyrings",
     ".openshot_qt",
@@ -65,7 +68,9 @@ def main():  # pylint: disable=too-many-locals
                 group_file_list.append(f"{file_index}={escaped_root}+AFw-{file_name}")
                 file_index += 1
 
-    with open("D:\\git-home\\main.prj", "w", newline="\r\n") as prj_file:
+    with open(
+        "D:\\git-home\\main.prj", "w", newline="\r\n", encoding="utf8"
+    ) as prj_file:
         print("[Project ID]", file=prj_file)
         print(" Signature=UE Proj: v.1", file=prj_file)
         print("[Project Information]", file=prj_file)

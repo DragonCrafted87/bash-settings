@@ -9,7 +9,7 @@ from os import rename
 from shutil import rmtree as rmdir
 from subprocess import run
 
-ENCODING_WORKERS = 8
+ENCODING_WORKERS = 4
 MAIN_WORKERS = 4
 
 ENCODING_EXECUTOR = ThreadPoolExecutor(max_workers=ENCODING_WORKERS)
