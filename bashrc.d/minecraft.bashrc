@@ -1,28 +1,53 @@
 #!/bin/bash
 
-function mc-command ()
+function mc-vpp-command ()
 {
-    kubectl exec -it -n games "$(kubectl get -n games pod --selector=role=minecraft -o jsonpath='{.items..metadata.name}')" -- "$@"
+    kubectl exec -it -n games "$(kubectl get -n games pod --selector=role=minecraft-vpp -o jsonpath='{.items..metadata.name}')" -- "$@"
 }
 
-function mc-logs ()
+function mc-vpp-logs ()
 {
-    kubectl logs -n games "$(kubectl get -n games pod --selector=role=minecraft -o jsonpath='{.items..metadata.name}')" -f
+    kubectl logs -n games "$(kubectl get -n games pod --selector=role=minecraft-vpp -o jsonpath='{.items..metadata.name}')" -f
 }
 
-function mc-describe ()
+function mc-vpp-describe ()
 {
-    kubectl describe -n games pod "$(kubectl get -n games pod --selector=role=minecraft -o jsonpath='{.items..metadata.name}')"
+    kubectl describe -n games pod "$(kubectl get -n games pod --selector=role=minecraft-vpp -o jsonpath='{.items..metadata.name}')"
 }
 
-function mc-rcon ()
+function mc-vpp-rcon ()
 {
-    mc-command mcrcon --password rcon 127.0.0.1
+    mc-vpp-command mcrcon --password rcon 127.0.0.1
 }
 
-function mc-delete-pod ()
+function mc-vpp-delete-pod ()
 {
-    kubectl delete -n games pod "$(kubectl get -n games pod --selector=role=minecraft -o jsonpath='{.items..metadata.name}')"
+    kubectl delete -n games pod "$(kubectl get -n games pod --selector=role=minecraft-vpp -o jsonpath='{.items..metadata.name}')"
+}
+
+function mc-uhc-command ()
+{
+    kubectl exec -it -n games "$(kubectl get -n games pod --selector=role=minecraft-uhc -o jsonpath='{.items..metadata.name}')" -- "$@"
+}
+
+function mc-uhc-logs ()
+{
+    kubectl logs -n games "$(kubectl get -n games pod --selector=role=minecraft-uhc -o jsonpath='{.items..metadata.name}')" -f
+}
+
+function mc-uhc-describe ()
+{
+    kubectl describe -n games pod "$(kubectl get -n games pod --selector=role=minecraft-uhc -o jsonpath='{.items..metadata.name}')"
+}
+
+function mc-uhc-rcon ()
+{
+    mc-uhc-command mcrcon --password rcon 127.0.0.1
+}
+
+function mc-uhc-delete-pod ()
+{
+    kubectl delete -n games pod "$(kubectl get -n games pod --selector=role=minecraft-uhc -o jsonpath='{.items..metadata.name}')"
 }
 
 function mc-update-mods ()
