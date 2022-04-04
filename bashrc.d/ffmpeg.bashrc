@@ -11,17 +11,17 @@ function ffmpeg-concatenate-videos ()
 
     output_file_name="$1.mkv"
 
-    #    video_codec="h264"
-    #    audio_codec="flac"
+    video_codec="h264"
+    audio_codec="flac"
 
-    video_codec="copy"
-    audio_codec="copy"
+    #    video_codec="copy"
+    #    audio_codec="copy"
 
     ffmpeg -f concat \
         -safe 0 \
         -i "$file_list_file" \
-        -map 0 \
-        -c copy \
+        -map_metadata 0 \
+        -map_chapters 0 \
         -acodec $audio_codec \
         -vcodec $video_codec \
         -scodec copy \
@@ -168,3 +168,7 @@ function ffmpeg-video-make-dvd ()
 #ffmpeg-split-video Pokemon_Master_Quest_D1_t00 00:00:00 00:41:09 01:20:41
 #ffmpeg-split-video-by-chapters Pokemon_Master_Quest_D7_t00.mkv
 #ffmpeg-merge-videos-by-chapters Pokemon_Master_Quest_D1_t00 4 36
+
+#
+#ffmpeg-video-split-by-timestamps JESUS_D1_t00.mkv 00:00:00 01:36:50 03:13:16
+#ffmpeg-video-split-by-timestamps JESUS_D2_t00.mkv 00:00:00 01:36:14 03:11:10

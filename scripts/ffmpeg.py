@@ -67,7 +67,7 @@ def video_crop_encode(input_filename, output_filename):
         "-vcodec",
         "h264",
         "-map",
-        "0:a",
+        "0:a?",
         "-acodec",
         "flac",
         "-map",

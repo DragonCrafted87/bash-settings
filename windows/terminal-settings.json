@@ -1,9 +1,6 @@
 {
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "copyFormatting": "none",
-    "copyOnSelect": true,
-    "defaultProfile": "{00000000-0000-0000-ba54-000000000002}",
-    "keybindings": [
+    "actions": [
         {
             "command": "find",
             "keys": "ctrl+shift+f"
@@ -17,9 +14,14 @@
             "keys": "alt+shift+d"
         }
     ],
+    "copyFormatting": "none",
+    "copyOnSelect": true,
+    "defaultProfile": "{91c9fb0c-9846-4a87-9442-51220882ed33}",
+    "launchMode": "maximized",
     "multiLinePasteWarning": false,
     "profiles": {
         "defaults": {
+            "bellStyle": "window",
             "colorScheme": "Tango Dark"
         },
         "list": [
@@ -44,7 +46,8 @@
             {
                 "closeOnExit": "graceful",
                 "commandline": "\"%PROGRAMFILES%\\git\\usr\\bin\\bash.exe\" -i -l",
-                "guid": "{00000000-0000-0000-ba54-000000000002}",
+                "guid": "{c9d8ab36-1661-48d3-9e95-bc74a691007f}",
+                "hidden": true,
                 "icon": "%PROGRAMFILES%\\Git\\mingw64\\share\\git\\git-for-windows.ico",
                 "name": "Git Bash",
                 "padding": "0, 0, 0, 0",
@@ -52,10 +55,21 @@
                 "startingDirectory": "%HOME%"
             },
             {
-                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
-                "hidden": false,
-                "name": "Ubuntu",
-                "source": "Windows.Terminal.Wsl"
+                "commandline": "D:/msys64/msys2_shell.cmd -defterm -here -no-start -clang64",
+                "guid": "{91c9fb0c-9846-4a87-9442-51220882ed33}",
+                "icon": "D:/msys64/clang64.ico",
+                "name": "CLANG64 / MSYS2",
+                "padding": "0, 0, 0, 0",
+                "snapOnInput": true,
+                "startingDirectory": "%HOME%"
+            },
+            {
+                "commandline": "C:/msys64/msys2_shell.cmd -defterm -here -no-start -msys",
+                "guid": "{71160544-14d8-4194-af25-d05feeac7233}",
+                "hidden": true,
+                "icon": "D:/msys64/msys2.ico",
+                "name": "MSYS / MSYS2",
+                "startingDirectory": "%HOME%"
             }
         ]
     },
