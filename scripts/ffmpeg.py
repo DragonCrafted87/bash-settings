@@ -90,7 +90,7 @@ def encode_all_files():
     executor = get_encoding_executor()
     futures = []
 
-    file_list = glob("*.mkv")
+    file_list = glob("*.mkv") + glob("*.mp4")
     for file_name in file_list:
         input_filename = file_name
         output_filename = file_name.rsplit(".", 1)[0] + ".mkv"
