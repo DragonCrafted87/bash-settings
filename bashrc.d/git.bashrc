@@ -64,3 +64,9 @@ function git-convert-master-to-main ()
     git branch -u origin/main main
     git remote set-head origin -a
 }
+
+function git-update-pre-commit-hook ()
+{
+    root_dir=$(git rev-parse --show-toplevel)
+    cp ~/.git-template/hooks/pre-commit "$root_dir"/.git/hooks/pre-commit
+}

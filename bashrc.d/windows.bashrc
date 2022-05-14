@@ -66,6 +66,7 @@ function msys-install-base-packages ()
         mingw-w64-clang-x86_64-ffmpeg \
         mingw-w64-clang-x86_64-ninja \
         mingw-w64-clang-x86_64-python-pip \
+        mingw-w64-clang-x86_64-rust \
         mingw-w64-clang-x86_64-toolchain
 
     /clang64/bin/pip.exe install wheel
