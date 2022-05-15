@@ -1,5 +1,8 @@
 #!/bin/bash
 
+alias pre-commit-check='pre-commit run --all-files'
+alias pre-commit-update='pre-commit autoupdate'
+
 function git-push-tags ()
 {
     git push origin --tags

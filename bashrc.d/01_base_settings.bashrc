@@ -35,9 +35,9 @@ export GOPATH=$HOME/go
 
 BASE_PATH=$PATH
 
-PATH=/home/dragon/bin
-PATH=$PATH:/home/dragon/.local/bin
-PATH=$PATH:/home/dragon/scripts
+PATH=$HOME/bin
+PATH=$PATH:$HOME/.local/bin
+PATH=$PATH:$HOME/scripts
 PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 PATH=$PATH:$HOME/bash-settings/scripts
 PATH=$PATH:$BASE_PATH

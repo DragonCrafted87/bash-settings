@@ -11,7 +11,8 @@ blocks:
     -   type: path
         style: plain
         properties:
-            style: full
+            folder_separator_icon: /
+            style: agnoster_full
         template: >-
             <#06989A>{{ .Path }} </>
     -   properties:

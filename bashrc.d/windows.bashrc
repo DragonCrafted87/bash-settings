@@ -9,17 +9,10 @@ case "$OSTYPE" in
 esac
 USER=$(whoami)
 
-export CC=/bin/clang
-export CXX=/bin/clang++
-
-alias python=/bin/python.exe
-
-BASE_PATH=$PATH
-PATH="/d/git-home/bin"
-PATH=$PATH:$BASE_PATH
-PATH="$PATH:/c/Program Files/nodejs"
-PATH="$PATH:/c/Program Files/Docker/Docker/resources/bin/"
-export PATH
+function msys-shutdown ()
+{
+    taskkill.exe //f //FI "MODULES eq msys-2.0.dll"
+}
 
 function windows-clear-icon-cache ()
 {
@@ -41,34 +34,23 @@ function windows-clear-thumbnail-cache ()
     cd "$saved_dir" || return
 }
 
-function msys-setup ()
+WINGET_PACKAGE_LIST=( \
+        "BraveSoftware.BraveBrowser" \
+        "Discord.Discord" \
+        "Docker.DockerDesktop" \
+        "Git.Git" \
+        "LLVM.LLVM" \
+        "Logitech.GHUB" \
+        "Microsoft.VisualStudioCode" \
+        "Microsoft.WindowsTerminal" \
+        "Python.Python.3" \
+        "Twilio.Authy" \
+    )
+
+function winget-install-packages ()
 {
-    grep "^${USERNAME}:" /etc/passwd >/dev/null 2>&1 || mkpasswd | grep "^${USERNAME}:" >> /etc/passwd
-    nano /etc/passwd
-}
-
-
-function msys-update ()
-{
-    pacman -Syuu
-}
-
-function msys-install-base-packages ()
-{
-    pacman -S \
-        --needed \
-        base-devel \
-        python-pip \
-        git \
-        mingw-w64-clang-x86_64-boost\
-        mingw-w64-clang-x86_64-cmake \
-        mingw-w64-clang-x86_64-cppcheck \
-        mingw-w64-clang-x86_64-ffmpeg \
-        mingw-w64-clang-x86_64-ninja \
-        mingw-w64-clang-x86_64-python-pip \
-        mingw-w64-clang-x86_64-rust \
-        mingw-w64-clang-x86_64-toolchain
-
-    /clang64/bin/pip.exe install wheel
-    /clang64/bin/pip.exe install requests python-dateutil
+    for i in "${WINGET_PACKAGE_LIST[@]}"
+    do
+        winget install "$i" -e --source winget
+    done
 }
