@@ -9,6 +9,34 @@ case "$OSTYPE" in
 esac
 USER=$(whoami)
 
+WINGET_PACKAGE_LIST=( \
+        "7zip.7zip" \
+        "BraveSoftware.BraveBrowser" \
+        "Discord.Discord" \
+        "Docker.DockerDesktop" \
+        "Foxit.FoxitReader" \
+        "Git.Git" \
+        "Inkscape.Inkscape" \
+        "JFrog.Conan" \
+        "Kitware.CMake" \
+        "Klocman.BulkCrapUninstaller" \
+        "LLVM.LLVM" \
+        "Logitech.GHUB" \
+        "Microsoft.OpenJDK.17" \
+        "Microsoft.VisualStudioCode" \
+        "Microsoft.WindowsTerminal" \
+        "OBSProject.OBSStudio" \
+        "OpenJS.NodeJS" \
+        "Plex.Plex" \
+        "Python.Python.3" \
+        "Racket.Racket" \
+        "TeamViewer.TeamViewer" \
+        "Twilio.Authy" \
+    )
+
+WINGET_INSTALL_LIST=( \
+    )
+
 function msys-shutdown ()
 {
     taskkill.exe //f //FI "MODULES eq msys-2.0.dll"
@@ -34,22 +62,6 @@ function windows-clear-thumbnail-cache ()
     cd "$saved_dir" || return
 }
 
-WINGET_PACKAGE_LIST=( \
-        "BraveSoftware.BraveBrowser" \
-        "Discord.Discord" \
-        "Docker.DockerDesktop" \
-        "Git.Git" \
-        "Inkscape.Inkscape" \
-        "LLVM.LLVM" \
-        "Logitech.GHUB" \
-        "Microsoft.VisualStudioCode" \
-        "Microsoft.WindowsTerminal" \
-        "OBSProject.OBSStudio" \
-        "Plex.Plex" \
-        "Python.Python.3" \
-        "Twilio.Authy" \
-    )
-
 function winget-upgrade-packages ()
 {
     for i in "${WINGET_PACKAGE_LIST[@]}"
@@ -58,10 +70,9 @@ function winget-upgrade-packages ()
     done
 }
 
-
 function winget-install-packages ()
 {
-    for i in "${WINGET_PACKAGE_LIST[@]}"
+    for i in "${WINGET_INSTALL_LIST[@]}"
     do
         winget install "$i" -e --source winget
     done
