@@ -39,13 +39,24 @@ WINGET_PACKAGE_LIST=( \
         "Discord.Discord" \
         "Docker.DockerDesktop" \
         "Git.Git" \
+        "Inkscape.Inkscape" \
         "LLVM.LLVM" \
         "Logitech.GHUB" \
         "Microsoft.VisualStudioCode" \
         "Microsoft.WindowsTerminal" \
+        "OBSProject.OBSStudio" \
         "Python.Python.3" \
         "Twilio.Authy" \
     )
+
+function winget-upgrade-packages ()
+{
+    for i in "${WINGET_PACKAGE_LIST[@]}"
+    do
+        winget upgrade "$i" -e --source winget
+    done
+}
+
 
 function winget-install-packages ()
 {
