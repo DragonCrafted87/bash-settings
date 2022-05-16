@@ -1,5 +1,7 @@
 #!/bin/bash
 
+DEPTH_TO_SEARCH=3
+
 alias pre-commit-check='pre-commit run --all-files'
 alias pre-commit-update='pre-commit autoupdate'
 
@@ -20,7 +22,7 @@ function git-release-file ()
 
 function git-status-all-repos ()
 {
-    find . -maxdepth 2 -name .git -type d -execdir sh -c '
+    find . -maxdepth $DEPTH_TO_SEARCH -name .git -type d -execdir sh -c '
            basename -s .git `git config --get remote.origin.url`;
            git status --short --branch;
     echo "";' -- {} \;
@@ -28,7 +30,7 @@ function git-status-all-repos ()
 
 function git-pull-all-repos ()
 {
-    find . -maxdepth 2 -name .git -type d -execdir sh -c '
+    find . -maxdepth $DEPTH_TO_SEARCH -name .git -type d -execdir sh -c '
            basename -s .git `git config --get remote.origin.url`;
            git pull;
     echo "";' -- {} \;
@@ -36,7 +38,7 @@ function git-pull-all-repos ()
 
 function git-push-all-repos ()
 {
-    find . -maxdepth 2 -name .git -type d -execdir sh -c '
+    find . -maxdepth $DEPTH_TO_SEARCH -name .git -type d -execdir sh -c '
            basename -s .git `git config --get remote.origin.url`;
            git push;
     echo "";' -- {} \;
@@ -44,7 +46,7 @@ function git-push-all-repos ()
 
 function git-init-all-repos ()
 {
-    find . -maxdepth 2 -name .git -type d -execdir sh -c '
+    find . -maxdepth $DEPTH_TO_SEARCH -name .git -type d -execdir sh -c '
            basename -s .git `git config --get remote.origin.url`;
            git init;
     echo "";' -- {} \;

@@ -9,8 +9,8 @@ case "$OSTYPE" in
         [[ -t 1 ]] && echo "MS Windows"
         BASE_PATH=$PATH
         PATH=$PATH:$BASE_PATH
-        PATH="$PATH:/c/Program Files/nodejs"
         PATH="$PATH:/c/Program Files/Docker/Docker/resources/bin/"
+        PATH="$PATH:/c/Program Files/LLVM/bin"
         export PATH
         ;;
     *)

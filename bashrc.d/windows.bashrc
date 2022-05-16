@@ -45,6 +45,7 @@ WINGET_PACKAGE_LIST=( \
         "Microsoft.VisualStudioCode" \
         "Microsoft.WindowsTerminal" \
         "OBSProject.OBSStudio" \
+        "Plex.Plex" \
         "Python.Python.3" \
         "Twilio.Authy" \
     )
