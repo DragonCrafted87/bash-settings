@@ -53,7 +53,7 @@ blocks:
         style: diamond
         template: >-
             <#555753>RAM:</>{{ if (gt .PhysicalPercentUsed 90.0) }}<#CC0000>{{ else if (gt .PhysicalPercentUsed 70.0) }}<#C4A000>{{ else }}<#4E9A06>{{ end }}
-            {{ .PhysicalPercentUsed }}%
+            {{ (round .PhysicalPercentUsed 2) }}%
             {{ (div ((sub .PhysicalTotalMemory .PhysicalFreeMemory)|float64) 1000000000.0) }}/{{ (div .PhysicalTotalMemory 1000000000.0) }}GB
             </>
 -   alignment: left
