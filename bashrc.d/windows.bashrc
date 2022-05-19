@@ -13,7 +13,7 @@ WINGET_PACKAGE_LIST=( \
         "7zip.7zip" \
         "BraveSoftware.BraveBrowser" \
         "Discord.Discord" \
-        "Docker.DockerDesktop" \
+        "suse.RancherDesktop" \
         "Foxit.FoxitReader" \
         "Git.Git" \
         "Inkscape.Inkscape" \

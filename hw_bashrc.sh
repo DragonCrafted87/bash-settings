@@ -15,3 +15,5 @@ function update-bash-settings ()
     source ~/.bashrc
     cd "$saved_working_dir" || return
 }
+
+eval "$(oh-my-posh init bash --config /home/dragon/bash-settings/omp.yaml)"
