@@ -150,18 +150,18 @@ function ffmpeg-video-merge-chapters ()
 function ffmpeg-video-crop-encode ()
 {
     if [ -z "$1" ]; then
-        /clang64/bin/python3.exe -I ~/bash-settings/scripts/ffmpeg.py encode
+        python -I ~/bash-settings/scripts/ffmpeg.py encode
     else
-        /clang64/bin/python3.exe -I ~/bash-settings/scripts/ffmpeg.py encode --input_filename="$1"
+        python -I ~/bash-settings/scripts/ffmpeg.py encode --input_filename="$1"
     fi
 }
 
 function ffmpeg-video-make-dvd ()
 {
     if [ -z "$1" ]; then
-        /clang64/bin/python3.exe -I ~/bash-settings/scripts/ffmpeg.py make-dvd
+        python -I ~/bash-settings/scripts/ffmpeg.py make-dvd
     else
-        /clang64/bin/python3.exe -I ~/bash-settings/scripts/ffmpeg.py make-dvd --input_filename="$1"
+        python -I ~/bash-settings/scripts/ffmpeg.py make-dvd --input_filename="$1"
     fi
 }
 

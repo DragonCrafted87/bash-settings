@@ -1,5 +1,7 @@
 #!/bin/bash
 
+alias k8s='kubectl '
+
 function k8s-show-all ()
 {
     clear

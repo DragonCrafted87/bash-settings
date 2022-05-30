@@ -19,6 +19,8 @@ sudo ln -s /usr/bin/python3 /usr/bin/python
 sudo apt autoremove --purge kubeadm  kubectl  kubelet
 sudo apt autoremove --purge docker-ce docker-ce-cli containerd.io
 
+sudo hostnamectl set-hostname rancher.lan
+
 #add to root crontab
 sudo crontab -e
 # @reboot sudo swapoff -a
@@ -29,13 +31,3 @@ sudo apt update
 sudo apt dist-upgrade
 
 # do hw specific setup
-
-sudo apt install nfs-common cifs-utils
-sudo apt install cifs-utils
-
-
-#install microk8s
-sudo snap install microk8s --classic --channel=1.19/stable
-
-#from an active node run then execute the join command
-microk8s add-node

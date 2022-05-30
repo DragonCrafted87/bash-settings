@@ -13,11 +13,12 @@ WINGET_PACKAGE_LIST=( \
         "7zip.7zip" \
         "BraveSoftware.BraveBrowser" \
         "Discord.Discord" \
-        "suse.RancherDesktop" \
         "Foxit.FoxitReader" \
         "Git.Git" \
+        "GuinpinSoft.MakeMKV" \
         "Inkscape.Inkscape" \
         "JFrog.Conan" \
+        "KDE.Kdenlive" \
         "Kitware.CMake" \
         "Klocman.BulkCrapUninstaller" \
         "LLVM.LLVM" \
@@ -30,6 +31,7 @@ WINGET_PACKAGE_LIST=( \
         "Plex.Plex" \
         "Python.Python.3" \
         "Racket.Racket" \
+        "suse.RancherDesktop" \
         "TeamViewer.TeamViewer" \
         "Twilio.Authy" \
     )
