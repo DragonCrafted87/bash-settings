@@ -16,4 +16,5 @@ function update-bash-settings ()
     cd "$saved_working_dir" || return
 }
 
-eval "$(oh-my-posh init bash --config ~/bash-settings/omp.yaml)"
+# shellcheck disable=SC2086
+eval "$(oh-my-posh init bash --config /home/$BASH_SETTING_USERNAME/bash-settings/omp.yaml)"
