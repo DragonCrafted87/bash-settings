@@ -1,82 +1,86 @@
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.2.0
-    hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
-    -   id: fix-byte-order-marker
-    -   id: fix-encoding-pragma
-    -   id: mixed-line-ending
-        args:
-        -   --fix=lf
-    -   id: check-yaml
-    -   id: check-added-large-files
-    -   id: check-json
-    -   id: pretty-format-json
-        args:
-        -   --autofix
-        -   --indent
-        -   '4'
--   repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.3.0
-    hooks:
-    -   id: pretty-format-yaml
-        args:
-        -   --autofix
-        -   --indent
-        -   '4'
--   repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.14
-    hooks:
-    -   id: mdformat
-        args:
-        -   --end-of-line
-        -   lf
-        additional_dependencies:
-        -   mdformat-gfm
-        -   mdformat-black
--   repo: https://github.com/adrienverge/yamllint
-    rev: v1.26.3
-    hooks:
-    -   id: yamllint
--   repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.31.1
-    hooks:
-    -   id: markdownlint
--   repo: https://github.com/psf/black
-    rev: 22.3.0
-    hooks:
-    -   id: black
-        language_version: python3
--   repo: https://github.com/pycqa/isort
-    rev: 5.10.1
-    hooks:
-    -   id: isort
-        args:
-        -   --profile
-        -   black
-        -   --filter-files
-        -   --force-single-line-imports
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
-    hooks:
-    -   id: flake8
-        args:
-        -   --extend-ignore=E203
-        -   --max-line-length=88
--   repo: https://github.com/PyCQA/pylint
-    rev: v2.14.0-b1
-    hooks:
-    -   id: pylint
--   repo: https://github.com/lovesegfault/beautysh
-    rev: v6.2.1
-    hooks:
-    -   id: beautysh
-        types: [bash, shell]
-        args:
-        -   --indent-size
-        -   '4'
--   repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.8.0.4
-    hooks:
-    -   id: shellcheck
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.2.0
+  hooks:
+  - id: trailing-whitespace
+  - id: end-of-file-fixer
+  - id: fix-byte-order-marker
+  - id: fix-encoding-pragma
+  - id: mixed-line-ending
+    args:
+    - --fix=lf
+  - id: check-yaml
+  - id: check-added-large-files
+  - id: check-json
+  - id: pretty-format-json
+    args:
+    - --autofix
+    - --indent
+    - '4'
+# YAML
+- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  rev: v2.3.0
+  hooks:
+  - id: pretty-format-yaml
+    args:
+    - --autofix
+    - --indent
+    - '2'
+- repo: https://github.com/adrienverge/yamllint
+  rev: v1.26.3
+  hooks:
+  - id: yamllint
+# MARKDOWN
+- repo: https://github.com/executablebooks/mdformat
+  rev: 0.7.14
+  hooks:
+  - id: mdformat
+    args:
+    - --end-of-line
+    - lf
+    additional_dependencies:
+    - mdformat-gfm
+    - mdformat-black
+- repo: https://github.com/igorshubovych/markdownlint-cli
+  rev: v0.31.1
+  hooks:
+  - id: markdownlint
+# PYTHON
+- repo: https://github.com/psf/black
+  rev: 22.3.0
+  hooks:
+  - id: black
+    language_version: python3
+- repo: https://github.com/pycqa/isort
+  rev: 5.10.1
+  hooks:
+  - id: isort
+    args:
+    - --profile
+    - black
+    - --filter-files
+    - --force-single-line-imports
+- repo: https://gitlab.com/pycqa/flake8
+  rev: 3.9.2
+  hooks:
+  - id: flake8
+    args:
+    - --extend-ignore=E203
+    - --max-line-length=88
+- repo: https://github.com/PyCQA/pylint
+  rev: v2.14.1
+  hooks:
+  - id: pylint
+# SHELL
+- repo: https://github.com/lovesegfault/beautysh
+  rev: v6.2.1
+  hooks:
+  - id: beautysh
+    types: [bash, shell]
+    args:
+    - --indent-size
+    - '4'
+- repo: https://github.com/shellcheck-py/shellcheck-py
+  rev: v0.8.0.4
+  hooks:
+  - id: shellcheck

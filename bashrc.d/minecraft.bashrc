@@ -53,15 +53,15 @@ function mc-uhc-delete-pod ()
 function mc-update-mods ()
 {
     if [ -z "$1" ]; then
-        MINECRAFT_VERSION='1.18.1'
+        MINECRAFT_VERSION='1.18.2'
     else
         MINECRAFT_VERSION="$1"
     fi
 
-    /clang64/bin/python3.exe -I \
+    python -I \
         ~/bash-settings/scripts/mod_downloader.py \
         'S:\Games\MineCraft\modlist.conf' \
-        'D:\Games\MultiMC\instances\Fabric_Primary\.minecraft\mods' \
+        'D:\Games\MultiMC\instances\Fabric_Primary\.minecraft' \
         "$MINECRAFT_VERSION"
 
 }

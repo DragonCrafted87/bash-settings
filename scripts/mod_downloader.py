@@ -1,22 +1,30 @@
 # -*- coding: utf-8 -*-
 
+import io
 from argparse import ArgumentParser
 from glob import glob
-from os import mkdir
+from json import loads as json_loads
+from operator import itemgetter
+from os import makedirs
 from os import remove as delete_file
+from os.path import dirname
 from pathlib import PurePath
 from pprint import pprint
 from re import search
 from sys import exit as sys_exit
 from urllib.parse import quote
+from zipfile import ZipFile
 
 from dateutil.parser import parse as parse_date  # pylint: disable=import-error
 from requests import get as http_get  # pylint: disable=import-error
 
+DEBUG = False
 
-def file_download(url, mods_folder):
+
+def file_download(url, minecraft_folder):
     path, url = url
     file_stream = http_get(url, stream=True)
+    mods_folder = f"{minecraft_folder}/mods"
 
     mod_name = path[0 : search(r"\d", path).start() - 1]
     old_mod_prefix = str(PurePath(mods_folder, mod_name))
@@ -33,6 +41,54 @@ def file_download(url, mods_folder):
     pprint(f"Saving updated mod: {mod_full_path}")
     with open(mod_full_path, "wb") as new_file:
         new_file.write(file_stream.content)
+
+
+def mr_pack_download(url, minecraft_folder):
+    path, url = url
+    file_stream = http_get(url, stream=True)
+
+    with ZipFile(io.BytesIO(file_stream.content)) as thezip:
+        for zipinfo in thezip.infolist():
+            if zipinfo.filename == "modrinth.index.json":
+                with thezip.open(zipinfo) as thefile:
+                    mod_list = json_loads(thefile.read())
+                    for mod_data in mod_list["files"]:
+                        path = mod_data["path"]
+                        if path.startswith("mods/"):
+                            file_download(
+                                (path.removeprefix("mods/"), mod_data["downloads"][0]),
+                                minecraft_folder,
+                            )
+            elif not zipinfo.is_dir() and zipinfo.filename.startswith("overrides/"):
+                pprint(zipinfo.filename)
+
+                save_path = str(
+                    PurePath(
+                        minecraft_folder, zipinfo.filename.removeprefix("overrides/")
+                    )
+                )
+                makedirs(dirname(save_path), exist_ok=True)
+
+                with thezip.open(zipinfo.filename) as extracted_file:
+                    with open(save_path, "wb") as new_file:
+                        new_file.write(extracted_file.read())
+        for zipinfo in thezip.infolist():
+            if not zipinfo.is_dir() and zipinfo.filename.startswith(
+                "client-overrides/"
+            ):
+                pprint(zipinfo.filename)
+
+                save_path = str(
+                    PurePath(
+                        minecraft_folder,
+                        zipinfo.filename.removeprefix("client-overrides/"),
+                    )
+                )
+                makedirs(dirname(save_path), exist_ok=True)
+
+                with thezip.open(zipinfo.filename) as extracted_file:
+                    with open(save_path, "wb") as new_file:
+                        new_file.write(extracted_file.read())
 
 
 def curseforge_parse(api_data, minecraft_version):
@@ -109,31 +165,63 @@ def github_parse(api_data, minecraft_version):
     return None
 
 
+# https://docs.modrinth.com/api-spec/
+def modrinth_parse(url, minecraft_version, secondary_version):
+
+    query_parameters = {}
+    query_parameters["loaders"] = '["fabric"]'
+    query_parameters["game_versions"] = f'["{minecraft_version}"]'
+
+    api_data = http_get(url, params=query_parameters)
+    if api_data.status_code == 200:
+        version_list = api_data.json()
+
+        if len(version_list) == 0:
+            query_parameters["game_versions"] = f'["{secondary_version}"]'
+            api_data = http_get(url, params=query_parameters)
+
+            if api_data.status_code != 200:
+                return None
+
+        version = sorted(version_list, key=itemgetter("date_published"), reverse=True)[
+            0
+        ]
+
+        if DEBUG:
+            pprint(version)
+
+        return (version["files"][0]["filename"], version["files"][0]["url"])
+    return None
+
+
 def parse_mod_list(mod_list, minecraft_version, secondary_version):
     pprint("Parsing Mod List")
     download_list = []
     for url in mod_list:
 
-        for _ in range(5):
-            api_data = http_get(url)
-            if api_data.status_code == 200:
-                break
-
-        if api_data.status_code != 200:
-            pprint(f"Failed to get data for {url}")
-            continue
-
-        pprint(f"Getting data for {url}")
-        if "github" in url:
-            parse_function = github_parse
-        elif "cfwidget" in url:
-            parse_function = curseforge_parse
+        if "modrinth" in url:
+            download_link = modrinth_parse(url, minecraft_version, secondary_version)
         else:
-            continue
+            for _ in range(5):
+                api_data = http_get(url)
+                if api_data.status_code == 200:
+                    break
 
-        download_link = parse_function(api_data.json(), minecraft_version)
-        if download_link is None and secondary_version is not None:
-            download_link = parse_function(api_data.json(), secondary_version)
+            if api_data.status_code != 200:
+                pprint(f"Failed to get data for {url}")
+                continue
+
+            pprint(f"Getting data for {url}")
+            if "github" in url:
+                parse_function = github_parse
+            elif "cfwidget" in url:
+                parse_function = curseforge_parse
+            else:
+                continue
+
+            download_link = parse_function(api_data.json(), minecraft_version)
+            if download_link is None and secondary_version is not None:
+                download_link = parse_function(api_data.json(), secondary_version)
 
         if download_link is not None:
             download_list.append(download_link)
@@ -145,7 +233,7 @@ def main():
 
     argument_parser = ArgumentParser()
     argument_parser.add_argument("mod_list_path")
-    argument_parser.add_argument("mods_folder")
+    argument_parser.add_argument("minecraft_folder")
     argument_parser.add_argument("mc_version")
 
     args = argument_parser.parse_args()
@@ -174,17 +262,18 @@ def main():
 
     download_list = parse_mod_list(mod_list, minecraft_version, secondary_version)
 
-    try:
-        mkdir(args.mods_folder)
-    except OSError:
-        pass
+    mods_folder = f"{args.minecraft_folder}/mods"
+    makedirs(mods_folder, exist_ok=True)
 
     pprint("Downloading Mods")
     for download_link in download_list:
-        file_download(download_link, args.mods_folder)
+        if download_link[0].endswith("mrpack"):
+            mr_pack_download(download_link, args.minecraft_folder)
+        else:
+            file_download(download_link, args.minecraft_folder)
 
     pprint("All Installed Mods")
-    pprint(glob(f"{str(PurePath(args.mods_folder,'*'))}"))
+    pprint(glob(f"{str(PurePath(mods_folder,'*'))}"))
 
 
 if __name__ == "__main__":
