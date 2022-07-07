@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "args": [
+                "~/bash-settings/scripts/mc_modlist.conf",
+                "D:/Games/PolyMC/instances/Fabric_Primary/.minecraft",
+                "1.19"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "name": "Python: Minecraft Mod Downloader",
+            "program": "${workspaceFolder}/scripts/mc_mod_downloader.py",
+            "request": "launch",
+            "type": "python"
+        }
+    ],
+    "version": "0.2.0"
+}

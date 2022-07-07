@@ -30,7 +30,8 @@ def file_download(url, minecraft_folder):
     old_mod_prefix = str(PurePath(mods_folder, mod_name))
     mod_full_path = str(PurePath(mods_folder, path))
 
-    pprint(f"Removing old version of: {old_mod_prefix}")
+    if DEBUG:
+        pprint(f"Removing old version of: {old_mod_prefix}")
     old_mod_files = glob(f"{old_mod_prefix}*")
     for old_file in old_mod_files:
         try:
@@ -38,7 +39,8 @@ def file_download(url, minecraft_folder):
         except OSError:
             pass
 
-    pprint(f"Saving updated mod: {mod_full_path}")
+    if DEBUG:
+        pprint(f"Saving updated mod: {mod_full_path}")
     with open(mod_full_path, "wb") as new_file:
         new_file.write(file_stream.content)
 
@@ -60,7 +62,8 @@ def mr_pack_download(url, minecraft_folder):
                                 minecraft_folder,
                             )
             elif not zipinfo.is_dir() and zipinfo.filename.startswith("overrides/"):
-                pprint(zipinfo.filename)
+                if DEBUG:
+                    pprint(zipinfo.filename)
 
                 save_path = str(
                     PurePath(
@@ -76,7 +79,8 @@ def mr_pack_download(url, minecraft_folder):
             if not zipinfo.is_dir() and zipinfo.filename.startswith(
                 "client-overrides/"
             ):
-                pprint(zipinfo.filename)
+                if DEBUG:
+                    pprint(zipinfo.filename)
 
                 save_path = str(
                     PurePath(
@@ -183,14 +187,20 @@ def modrinth_parse(url, minecraft_version, secondary_version):
             if api_data.status_code != 200:
                 return None
 
-        version = sorted(version_list, key=itemgetter("date_published"), reverse=True)[
-            0
-        ]
+        if len(version_list) != 0:
+            version = sorted(
+                version_list, key=itemgetter("date_published"), reverse=True
+            )[0]
 
-        if DEBUG:
-            pprint(version)
+            if DEBUG:
+                pprint(version)
 
-        return (version["files"][0]["filename"], version["files"][0]["url"])
+            files = version["files"]
+            for file in files:
+                if file["primary"]:
+                    return (file["filename"], file["url"])
+
+            return (files[0]["filename"], files[0]["url"])
     return None
 
 
@@ -211,7 +221,8 @@ def parse_mod_list(mod_list, minecraft_version, secondary_version):
                 pprint(f"Failed to get data for {url}")
                 continue
 
-            pprint(f"Getting data for {url}")
+            if DEBUG:
+                pprint(f"Getting data for {url}")
             if "github" in url:
                 parse_function = github_parse
             elif "cfwidget" in url:
@@ -273,7 +284,7 @@ def main():
             file_download(download_link, args.minecraft_folder)
 
     pprint("All Installed Mods")
-    pprint(glob(f"{str(PurePath(mods_folder,'*'))}"))
+    pprint(sorted(glob(f"{str(PurePath(mods_folder,'*'))}")))
 
 
 if __name__ == "__main__":

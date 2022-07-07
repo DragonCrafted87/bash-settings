@@ -5,6 +5,16 @@ function mc-vpp-command ()
     kubectl exec -it -n games "$(kubectl get -n games pod --selector=role=minecraft-vpp -o jsonpath='{.items..metadata.name}')" -- "$@"
 }
 
+# shellcheck disable=SC2034
+function mc-vpp-rcon ()
+{
+    MCRCON_HOST='192.168.8.3'
+    MCRCON_PORT='25575'
+    MCRCON_PASS='rcon'
+
+    mcrcon
+}
+
 function mc-vpp-logs ()
 {
     kubectl logs -n games "$(kubectl get -n games pod --selector=role=minecraft-vpp -o jsonpath='{.items..metadata.name}')" -f
@@ -53,15 +63,15 @@ function mc-uhc-delete-pod ()
 function mc-update-mods ()
 {
     if [ -z "$1" ]; then
-        MINECRAFT_VERSION='1.18.2'
+        MINECRAFT_VERSION='1.19'
     else
         MINECRAFT_VERSION="$1"
     fi
 
     python -I \
-        ~/bash-settings/scripts/mod_downloader.py \
-        'S:\Games\MineCraft\modlist.conf' \
-        'D:\Games\MultiMC\instances\Fabric_Primary\.minecraft' \
+        ~/bash-settings/scripts/mc_mod_downloader.py \
+        ~/bash-settings/scripts/mc_modlist.conf \
+        'D:\Games\PolyMC\instances\Fabric_Primary\.minecraft' \
         "$MINECRAFT_VERSION"
 
 }
