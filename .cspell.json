@@ -1,0 +1,39 @@
+{
+    "dictionaries": [
+        "en_US",
+        "companies",
+        "softwareTerms",
+        "misc",
+        "python",
+        "powershell",
+        "bash",
+        "filetypes",
+        "main",
+        "python-extra",
+        "shell"
+    ],
+    "dictionaryDefinitions": [
+        {
+            "addWords": true,
+            "name": "main",
+            "path": "./.cspell/main.dict"
+        },
+        {
+            "name": "python-extra",
+            "path": "./.cspell/python.dict"
+        },
+        {
+            "name": "shell",
+            "path": "./.cspell/shell.dict"
+        }
+    ],
+    "flagWords": [
+        "hte"
+    ],
+    "language": "en",
+    "minWordLength": 3,
+    "version": "0.2",
+    "words": [
+        "githubusercontent"
+    ]
+}

@@ -15,6 +15,7 @@ WINGET_PACKAGE_LIST=( \
         "Discord.Discord" \
         "Foxit.FoxitReader" \
         "Git.Git" \
+        "GIMP.GIMP" \
         "GuinpinSoft.MakeMKV" \
         "Inkscape.Inkscape" \
         "JFrog.Conan" \

@@ -9,7 +9,7 @@ rm .bashrc.d
 ln -s /home/dragon/bash-settings/hw_bashrc.sh .bashrc
 ln -s /home/dragon/bash-settings/bashrc.d/ .bashrc.d
 
-sudo sh -c 'echo "dragon ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/sudoers'
+sudo sh -c 'echo "dragon ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/dragon'
 sudo rm /root/.bashrc
 sudo ln -s /home/dragon/.bashrc /root/.bashrc
 sudo ln -s /home/dragon/.bashrc.d/ /root/.bashrc.d
@@ -28,6 +28,6 @@ sudo crontab -e
 sudo nano /etc/fstab
 
 sudo apt update
-sudo apt dist-upgrade
+sudo apt dist-upgrade -y
 
 # do hw specific setup

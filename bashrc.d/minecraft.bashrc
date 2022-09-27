@@ -63,7 +63,7 @@ function mc-uhc-delete-pod ()
 function mc-update-mods ()
 {
     if [ -z "$1" ]; then
-        MINECRAFT_VERSION='1.19'
+        MINECRAFT_VERSION='1.19.1'
     else
         MINECRAFT_VERSION="$1"
     fi

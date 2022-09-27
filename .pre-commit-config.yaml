@@ -84,3 +84,9 @@ repos:
   rev: v0.8.0.4
   hooks:
   - id: shellcheck
+# Spell Checker
+- repo: https://github.com/streetsidesoftware/cspell-cli
+  rev: v6.0.0
+  hooks:
+  - id: cspell
+    exclude: ^.gitignore|^.pre-commit-config.yaml|^.cspell

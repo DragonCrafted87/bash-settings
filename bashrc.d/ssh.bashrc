@@ -6,10 +6,14 @@ case "$HOSTNAME" in
         [[ -t 1 ]] && echo 'Skipping SSH Setup'
         ;;
 
-
-        # Add here more strings to compare
-        # See correspondence table at the bottom of this answer
-
+    *Dragon*)
+        function ssh-dragon-vm {
+            ssh dragon@192.168.0.11
+        }
+        function ssh-amd-node {
+            ssh dragon@amd64node"$1".lan
+        }
+        ;;
     *)
         # Start SSH Agent
         #----------------------------
