@@ -24,7 +24,7 @@ WINGET_PACKAGE_LIST=( \
         "Klocman.BulkCrapUninstaller" \
         "LLVM.LLVM" \
         "Logitech.GHUB" \
-        "Microsoft.OpenJDK.17" \
+        "BellSoft.LibericaJDK.17.Full" \
         "Microsoft.VisualStudioCode" \
         "Microsoft.WindowsTerminal" \
         "OBSProject.OBSStudio" \
