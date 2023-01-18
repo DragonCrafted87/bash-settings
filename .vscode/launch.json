@@ -2,9 +2,21 @@
     "configurations": [
         {
             "args": [
+                "audio-split-encode",
+                "--input_filename=E:/audible/export/Tin Man A Galaxy's E_1774242834_LC_128_44100_Stereo.aax"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "name": "Python: ffmpeg audiobooks",
+            "program": "${workspaceFolder}/scripts/ffmpeg.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
                 "~/bash-settings/scripts/mc_modlist.conf",
-                "D:/Games/PolyMC/instances/Fabric_Primary/.minecraft",
-                "1.19"
+                "D:/Games/MultiMC/instances/Fabric_Primary/.minecraft",
+                "1.19.3"
             ],
             "console": "integratedTerminal",
             "justMyCode": true,

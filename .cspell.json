@@ -4,6 +4,7 @@
         "companies",
         "softwareTerms",
         "bash",
+        "ffmpeg",
         "filetypes",
         "java-extra",
         "java",
@@ -31,6 +32,10 @@
         {
             "name": "java-extra",
             "path": "./.cspell/java.dict"
+        },
+        {
+            "name": "ffmpeg",
+            "path": "./.cspell/ffmpeg.dict"
         }
     ],
     "flagWords": [

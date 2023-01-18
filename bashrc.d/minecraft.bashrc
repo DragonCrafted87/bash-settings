@@ -71,7 +71,7 @@ function mc-update-mods ()
     python -I \
         ~/bash-settings/scripts/mc_mod_downloader.py \
         ~/bash-settings/scripts/mc_modlist.conf \
-        'D:\Games\MultiMC\instances\Fabric_Primary\.minecraft' \
+        'D:/Games/MultiMC/instances/Fabric_Primary/.minecraft' \
         "$MINECRAFT_VERSION"
 
 }

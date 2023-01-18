@@ -18,7 +18,7 @@ from zipfile import ZipFile
 from dateutil.parser import parse as parse_date  # pylint: disable=import-error
 from requests import get as http_get  # pylint: disable=import-error
 
-DEBUG = False
+DEBUG = True
 
 
 def file_download(url, minecraft_folder):
