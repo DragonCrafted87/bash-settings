@@ -39,5 +39,6 @@ function dns-pod-logs ()
 function dns-delete-all-pods ()
 {
     pods=$(dns-pods)
-    kubectl delete -n dns pod "$pods"
+    # shellcheck disable=SC2086
+    kubectl delete -n dns pod $pods
 }
