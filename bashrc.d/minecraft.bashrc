@@ -35,35 +35,35 @@ function mc-vpp-delete-pod ()
     kubectl delete -n games pod "$(kubectl get -n games pod --selector=role=minecraft-vpp -o jsonpath='{.items..metadata.name}')"
 }
 
-function mc-uhc-command ()
+function mc-redstone-command ()
 {
-    kubectl exec -it -n games "$(kubectl get -n games pod --selector=role=minecraft-uhc -o jsonpath='{.items..metadata.name}')" -- "$@"
+    kubectl exec -it -n games "$(kubectl get -n games pod --selector=role=minecraft-redstone -o jsonpath='{.items..metadata.name}')" -- "$@"
 }
 
-function mc-uhc-logs ()
+function mc-redstone-logs ()
 {
-    kubectl logs -n games "$(kubectl get -n games pod --selector=role=minecraft-uhc -o jsonpath='{.items..metadata.name}')" -f
+    kubectl logs -n games "$(kubectl get -n games pod --selector=role=minecraft-redstone -o jsonpath='{.items..metadata.name}')" -f
 }
 
-function mc-uhc-describe ()
+function mc-redstone-describe ()
 {
-    kubectl describe -n games pod "$(kubectl get -n games pod --selector=role=minecraft-uhc -o jsonpath='{.items..metadata.name}')"
+    kubectl describe -n games pod "$(kubectl get -n games pod --selector=role=minecraft-redstone -o jsonpath='{.items..metadata.name}')"
 }
 
-function mc-uhc-rcon ()
+function mc-redstone-rcon ()
 {
-    mc-uhc-command mcrcon --password rcon 127.0.0.1
+    mc-redstone-command mcrcon --password rcon 127.0.0.1
 }
 
-function mc-uhc-delete-pod ()
+function mc-redstone-delete-pod ()
 {
-    kubectl delete -n games pod "$(kubectl get -n games pod --selector=role=minecraft-uhc -o jsonpath='{.items..metadata.name}')"
+    kubectl delete -n games pod "$(kubectl get -n games pod --selector=role=minecraft-redstone -o jsonpath='{.items..metadata.name}')"
 }
 
 function mc-update-mods ()
 {
     if [ -z "$1" ]; then
-        MINECRAFT_VERSION='1.19.2'
+        MINECRAFT_VERSION='1.19.4'
     else
         MINECRAFT_VERSION="$1"
     fi
