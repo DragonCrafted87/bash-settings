@@ -149,7 +149,7 @@ def encode_all_video_files():
     executor = get_encoding_executor()
     futures = []
 
-    file_list = glob("*.mkv") + glob("*.mp4")
+    file_list = glob("*.mkv") + glob("*.mp4") + glob("*.avi")
     print(f"Encoding {len(file_list)} files.")
     for file_name in file_list:
         input_filename = file_name

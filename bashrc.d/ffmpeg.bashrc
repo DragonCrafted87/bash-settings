@@ -70,7 +70,7 @@ function ffmpeg-video-split-by-timestamps ()
                 -vcodec $video_codec \
                 -map 0:a \
                 -acodec $audio_codec \
-                -map 0:s \
+                -map 0:s? \
                 -scodec $subtitle_codec \
                 "$output_file_name" &
 
@@ -93,7 +93,7 @@ function ffmpeg-video-split-by-timestamps ()
             -vcodec $video_codec \
             -map 0:a \
             -acodec $audio_codec \
-            -map 0:s \
+            -map 0:s? \
             -scodec $subtitle_codec \
             "$output_file_name" &
     fi
@@ -131,13 +131,13 @@ function ffmpeg-video-merge-chapters ()
 
     total_episodes=$total_chapters/$chapters_per_episode
 
-    chapter=0
+    chapter=1
     for ((episode=1;episode<=total_episodes;episode++))
     do
         file_list=""
         for ((i=1;i<=chapters_per_episode;i++))
         do
-            file_list=$file_list"split"$(printf '_%03s_of_' $chapter)$base_file$file_extension
+            file_list=$file_list$base_file"_split"$(printf '_%03s' $chapter)$file_extension
             chapter=$((chapter+1))
         done
         ffmpeg_command=$base_command$base_file$(printf '_e%03d ' "$episode")$file_list
@@ -174,10 +174,6 @@ function ffmpeg-audio-split-encode ()
     fi
 }
 
-#ffmpeg-split-video Pokemon_Master_Quest_D1_t00 00:00:00 00:41:09 01:20:41
-#ffmpeg-split-video-by-chapters Pokemon_Master_Quest_D7_t00.mkv
-#ffmpeg-merge-videos-by-chapters Pokemon_Master_Quest_D1_t00 4 36
-
-#
-#ffmpeg-video-split-by-timestamps JESUS_D1_t00.mkv 00:00:00 01:36:50 03:13:16
-#ffmpeg-video-split-by-timestamps JESUS_D2_t00.mkv 00:00:00 01:36:14 03:11:10
+#ffmpeg-video-split-by-timestamps Pokemon_Master_Quest_D1_t00 00:00:00 00:41:09 01:20:41
+#ffmpeg-video-split-by-chapters Pokemon_Master_Quest_D7_t00.mkv
+#ffmpeg-video-merge-chapters Pokemon_Master_Quest_D1_t00 4 36
