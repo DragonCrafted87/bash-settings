@@ -5,7 +5,7 @@ function mc-vpp-command ()
     kubectl exec -it -n games "$(kubectl get -n games pod --selector=role=minecraft-vpp -o jsonpath='{.items..metadata.name}')" -- "$@"
 }
 
-# shellcheck disable=SC2034
+# shellcheck disable=SC2034,SC2317
 function mc-vpp-rcon ()
 {
     MCRCON_HOST='192.168.8.3'

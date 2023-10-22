@@ -41,7 +41,6 @@ def run_process(args, debug=False):
 
 # pylint: disable=too-many-statements
 def video_crop_encode(input_filename, output_filename):
-
     print(f"Scanning: {input_filename}")
     try:
         process_args = [
@@ -145,7 +144,6 @@ def video_crop_encode(input_filename, output_filename):
 
 
 def encode_all_video_files():
-
     executor = get_encoding_executor()
     futures = []
 
@@ -264,7 +262,6 @@ def audio_split_encode(input_filename):
 
 
 def encode_all_audio_files():
-
     executor = get_encoding_executor()
     futures = []
 
@@ -282,7 +279,6 @@ def encode_all_audio_files():
 
 
 def dvd_encode(input_filename, output_filename, folder_name, start_time, end_time):
-
     process_args = [
         "ffmpeg",
         "-i",
@@ -323,7 +319,6 @@ def dvd_get_chapter_timestamps(input_filename):
 
 
 def dvd_split_encode(input_filename, base_filename, folder_name):
-
     chapter_breakpoints = dvd_get_chapter_timestamps(input_filename)
     output_filename_list = []
 
@@ -361,7 +356,6 @@ def dvd_split_encode(input_filename, base_filename, folder_name):
 
 
 def dvd_author_disk(folder_name, filename_list):
-
     with open(f"{folder_name}/dvd.xml", "w", encoding="utf8") as dvd_author_commands:
         dvd_author_commands.write("<dvdauthor>")
         dvd_author_commands.write("   <vmgm>")
@@ -393,7 +387,6 @@ def dvd_author_disk(folder_name, filename_list):
 
 
 def dvd_make_iso(base_filename, folder_name):
-
     iso_name = f"{base_filename}.iso"
     process_args = [
         "mkisofs",
@@ -410,7 +403,6 @@ def dvd_make_iso(base_filename, folder_name):
 
 
 def create_dvd(input_filename):
-
     base_filename = input_filename.rsplit(".", 1)[0]
 
     folder_name = base_filename + ".iso.temp"
@@ -453,7 +445,6 @@ def main():
     elif args.command == "make-dvd":
         if not args.input_filename:
             with ThreadPoolExecutor(max_workers=MAIN_WORKERS) as executor:
-
                 file_list = glob("*.mkv")
                 futures = []
                 for file_name in file_list:

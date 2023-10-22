@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.2.0
+  rev: v4.5.0
   hooks:
   - id: trailing-whitespace
   - id: end-of-file-fixer
@@ -19,7 +19,7 @@ repos:
     - '4'
 # YAML
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.3.0
+  rev: v2.11.0
   hooks:
   - id: pretty-format-yaml
     args:
@@ -27,12 +27,12 @@ repos:
     - --indent
     - '2'
 - repo: https://github.com/adrienverge/yamllint
-  rev: v1.26.3
+  rev: v1.32.0
   hooks:
   - id: yamllint
 # MARKDOWN
 - repo: https://github.com/executablebooks/mdformat
-  rev: 0.7.14
+  rev: 0.7.17
   hooks:
   - id: mdformat
     args:
@@ -42,12 +42,12 @@ repos:
     - mdformat-gfm
     - mdformat-black
 - repo: https://github.com/igorshubovych/markdownlint-cli
-  rev: v0.31.1
+  rev: v0.37.0
   hooks:
   - id: markdownlint
 # PYTHON
 - repo: https://github.com/psf/black
-  rev: 22.3.0
+  rev: 23.10.0
   hooks:
   - id: black
     language_version: python3
@@ -61,14 +61,14 @@ repos:
     - --filter-files
     - --force-single-line-imports
 - repo: https://github.com/pycqa/flake8
-  rev: 3.9.2
+  rev: 6.1.0
   hooks:
   - id: flake8
     args:
     - --extend-ignore=E203
     - --max-line-length=88
 - repo: https://github.com/PyCQA/pylint
-  rev: v2.14.1
+  rev: v3.0.1
   hooks:
   - id: pylint
 # SHELL
@@ -81,12 +81,12 @@ repos:
     - --indent-size
     - '4'
 - repo: https://github.com/shellcheck-py/shellcheck-py
-  rev: v0.8.0.4
+  rev: v0.9.0.6
   hooks:
   - id: shellcheck
 # Spell Checker
 - repo: https://github.com/streetsidesoftware/cspell-cli
-  rev: v6.0.0
+  rev: v7.3.2
   hooks:
   - id: cspell
     exclude: ^.gitignore|^.pre-commit-config.yaml|^.cspell

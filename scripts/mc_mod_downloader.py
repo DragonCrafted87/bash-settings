@@ -171,7 +171,6 @@ def github_parse(api_data, minecraft_version):
 
 # https://docs.modrinth.com/api-spec/
 def modrinth_parse(url, minecraft_version, secondary_version):
-
     query_parameters = {}
     query_parameters["loaders"] = '["fabric"]'
     query_parameters["game_versions"] = f'["{minecraft_version}"]'
@@ -208,7 +207,6 @@ def parse_mod_list(mod_list, minecraft_version, secondary_version):
     pprint("Parsing Mod List")
     download_list = []
     for url in mod_list:
-
         if "modrinth" in url:
             download_link = modrinth_parse(url, minecraft_version, secondary_version)
         else:
@@ -241,7 +239,6 @@ def parse_mod_list(mod_list, minecraft_version, secondary_version):
 
 
 def main():
-
     argument_parser = ArgumentParser()
     argument_parser.add_argument("mod_list_path")
     argument_parser.add_argument("minecraft_folder")

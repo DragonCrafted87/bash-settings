@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC2086,SC2093,SC2016,SC2094,SC2164
+# shellcheck disable=SC2086,SC2093,SC2016,SC2094,SC2164,SC2317
 
 return
 

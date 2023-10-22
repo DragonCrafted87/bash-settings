@@ -1,5 +1,5 @@
 #!/bin/ash
-# shellcheck disable=SC2187,SC2016,SC2094,SC2164
+# shellcheck disable=SC2187,SC2016,SC2094,SC2164,SC2317
 
 return
 # apk add nano sudo git curl
