@@ -90,7 +90,7 @@ function worldographer ()
     /c/Program\ Files/BellSoft/LibericaJDK-17-Full/bin/java.exe \
         --module-path "/c/Program\ Files/BellSoft/LibericaJDK-17-Full/jmods" \
         --add-modules javafx.controls,javafx.web,javafx.swing,javafx.graphics,javafx.fxml \
-        -Xms18G \
-        -Xmx18G \
-        -jar "/d/git-home/bin/worldographer.jar"
+        -Xms12G \
+        -Xmx12G \
+        -jar "/d/git-home/bin/worldographer/worldographer-1.68.jar"
 }

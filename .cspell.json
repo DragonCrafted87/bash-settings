@@ -36,6 +36,10 @@
         {
             "name": "ffmpeg",
             "path": "./.cspell/ffmpeg.dict"
+        },
+        {
+            "name": "powershell",
+            "path": "./.cspell/powershell.dict"
         }
     ],
     "flagWords": [

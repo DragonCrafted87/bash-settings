@@ -10,6 +10,9 @@ case "$HOSTNAME" in
         function ssh-dragonfire {
             ssh root@192.168.0.1
         }
+        function ssh-dragondev {
+            ssh dragon@192.168.0.14
+        }
         function ssh-amd-node {
             ssh dragon@amd64node"$1".lan
         }

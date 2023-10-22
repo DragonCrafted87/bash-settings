@@ -11,30 +11,30 @@ USER=$(whoami)
 
 WINGET_PACKAGE_LIST=( \
         "7zip.7zip" \
+        "BellSoft.LibericaJDK.17.Full" \
         "BraveSoftware.BraveBrowser" \
         "Discord.Discord" \
+        "Docker.DockerDesktop" \
+        "EpicGames.EpicGamesLauncher" \
         "Foxit.FoxitReader" \
-        "Git.Git" \
         "GIMP.GIMP" \
+        "Git.Git" \
+        "GOG.Galaxy" \
         "GuinpinSoft.MakeMKV" \
         "Inkscape.Inkscape" \
+        "JAMSoftware.TreeSize.Free" \
         "JFrog.Conan" \
         "KDE.Kdenlive" \
         "Kitware.CMake" \
         "Klocman.BulkCrapUninstaller" \
-        "LLVM.LLVM" \
         "Logitech.GHUB" \
-        "BellSoft.LibericaJDK.17.Full" \
         "Microsoft.VisualStudioCode" \
         "Microsoft.WindowsTerminal" \
         "OBSProject.OBSStudio" \
-        "OpenJS.NodeJS" \
-        "Plex.Plex" \
-        "Python.Python.3" \
-        "Racket.Racket" \
-        "suse.RancherDesktop" \
+        "Python.Python.3.11" \
         "TeamViewer.TeamViewer" \
         "Twilio.Authy" \
+        "Valve.Steam" \
     )
 
 WINGET_INSTALL_LIST=( \
