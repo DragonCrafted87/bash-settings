@@ -1,4 +1,5 @@
 {
+    "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
     "actions": [
         {
@@ -16,59 +17,39 @@
     ],
     "copyFormatting": "none",
     "copyOnSelect": true,
-    "defaultProfile": "{91c9fb0c-9846-4a87-9442-51220882ed33}",
+    "defaultProfile": "{c9d8ab36-1661-48d3-9e95-bc74a691007f}",
     "launchMode": "maximized",
     "multiLinePasteWarning": false,
+    "newTabMenu": [
+        {
+            "type": "remainingProfiles"
+        }
+    ],
     "profiles": {
         "defaults": {
             "bellStyle": "window",
-            "colorScheme": "Tango Dark"
+            "colorScheme": "Tango Dark",
+            "font": {
+                "face": "Lucida Sans Typewriter"
+            }
         },
         "list": [
             {
-                "commandline": "powershell.exe",
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-                "hidden": false,
                 "name": "Windows PowerShell"
             },
             {
-                "commandline": "cmd.exe",
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-                "hidden": true,
                 "name": "Command Prompt"
-            },
-            {
-                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
-                "hidden": true,
-                "name": "Azure Cloud Shell",
-                "source": "Windows.Terminal.Azure"
             },
             {
                 "closeOnExit": "graceful",
                 "commandline": "\"%PROGRAMFILES%\\git\\usr\\bin\\bash.exe\" -i -l",
                 "guid": "{c9d8ab36-1661-48d3-9e95-bc74a691007f}",
-                "hidden": true,
                 "icon": "%PROGRAMFILES%\\Git\\mingw64\\share\\git\\git-for-windows.ico",
                 "name": "Git Bash",
                 "padding": "0, 0, 0, 0",
                 "snapOnInput": true,
-                "startingDirectory": "%HOME%"
-            },
-            {
-                "commandline": "D:/msys64/msys2_shell.cmd -defterm -here -no-start -clang64",
-                "guid": "{91c9fb0c-9846-4a87-9442-51220882ed33}",
-                "icon": "D:/msys64/clang64.ico",
-                "name": "CLANG64 / MSYS2",
-                "padding": "0, 0, 0, 0",
-                "snapOnInput": true,
-                "startingDirectory": "%HOME%"
-            },
-            {
-                "commandline": "C:/msys64/msys2_shell.cmd -defterm -here -no-start -msys",
-                "guid": "{71160544-14d8-4194-af25-d05feeac7233}",
-                "hidden": true,
-                "icon": "D:/msys64/msys2.ico",
-                "name": "MSYS / MSYS2",
                 "startingDirectory": "%HOME%"
             }
         ]
@@ -281,5 +262,6 @@
             "white": "#C0C0C0",
             "yellow": "#808000"
         }
-    ]
+    ],
+    "themes": []
 }
