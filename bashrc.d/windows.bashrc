@@ -16,6 +16,7 @@ WINGET_PACKAGE_LIST=( \
         "Discord.Discord" \
         "Docker.DockerDesktop" \
         "EpicGames.EpicGamesLauncher" \
+        "Facebook.Messenger" \
         "File-New-Project.EarTrumpet" \
         "Foxit.FoxitReader" \
         "GIMP.GIMP" \
