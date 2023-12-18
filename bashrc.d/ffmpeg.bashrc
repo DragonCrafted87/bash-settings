@@ -99,7 +99,6 @@ function ffmpeg-video-split-by-timestamps ()
     fi
     wait
 }
-
 function ffmpeg-video-split-by-chapters ()
 {
     file="$1"
