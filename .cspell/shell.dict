@@ -12,11 +12,14 @@ Kitware
 Klocman
 MCRCON
 NOPASSWD
+OPTARG
 Plex
 Upgradability
 WINGET
 WSL
+aarch
 apk
+armv
 autoupdate
 awk
 axo
@@ -41,6 +44,7 @@ fheader
 fishbmc
 fpy
 fui
+getconf
 goom
 greyhole
 histappend
@@ -91,6 +95,7 @@ thirdparty
 thumbcache
 timedatectl
 tmpfs
+tolower
 uhc
 usermod
 vnc
