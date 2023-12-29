@@ -4,6 +4,10 @@ install_dir=""
 
 error() {
     printf '\x1b[31m%s\e[0m\n' "$1"
+}
+
+error_exit() {
+    error "$1"
     exit 1
 }
 
@@ -43,7 +47,7 @@ SUPPORTED_TARGETS="linux-386 linux-amd64 linux-arm linux-arm64 darwin-amd64 darw
 
 validate_dependency() {
     if ! command -v "$1" >/dev/null; then
-        error "$1 is required to install Oh My Posh. Please install $1 and try again.\n"
+        error_exit "$1 is required to install Oh My Posh. Please install $1 and try again."
     fi
 }
 
@@ -76,12 +80,13 @@ set_install_directory() {
 
 validate_install_directory() {
     if [ ! -d "$install_dir" ]; then
-        error "Directory ${install_dir} does not exist, set a different directory and try again."
+        error_exit "Directory ${install_dir} does not exist, set a different directory and try again."
     fi
 
     # check if we can write to the install directory
     if [ ! -w "$install_dir" ]; then
-        error "Cannot write to ${install_dir}. Please set a different directory and try again: \n  curl -s https://ohmyposh.dev/install.sh | bash -s -- -d {directory}"
+        error "Cannot write to ${install_dir}. Please set a different directory and try again:"
+        error_exit "bash \"${PATH_BASH_SETTINGS}/scripts/install-omp.sh\" -d ${install_dir}"
     fi
 
     # check if the directory is in the PATH
@@ -117,7 +122,7 @@ install() {
     )
 
     if [ "${good}" != "1" ]; then
-        error "${arch} builds for ${platform} are not available for Oh My Posh"
+        error_exit "${arch} builds for ${platform} are not available for Oh My Posh"
     fi
 
     info
@@ -131,7 +136,8 @@ install() {
     http_response=$(curl -s -f -L "$url" -o "$executable" -w "%{http_code}")
 
     if [ "$http_response" != "200" ] || [ ! -f "$executable" ]; then
-        error "Unable to download executable at ${url}\nPlease validate your curl, connection and/or proxy settings"
+        error "Unable to download executable at ${url}"
+        error_exit "Please validate your curl, connection and/or proxy settings"
     fi
 
     chmod +x "$executable"
