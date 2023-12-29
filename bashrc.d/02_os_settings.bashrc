@@ -35,5 +35,5 @@ esac
 
 install-omp ()
 {
-    curl -s "${PATH_BASH_SETTINGS}/scripts/install-omp.sh" | bash -s -- -d "$OMP_INSTALL_DIR"
+    bash "${PATH_BASH_SETTINGS}/scripts/install-omp.sh" -d "$OMP_INSTALL_DIR"
 }
