@@ -3,16 +3,16 @@
 install_dir=""
 
 error() {
-    printf "\x1b[31m%s\e[0m\n" "$1"
+    printf '\x1b[31m%s\e[0m\n' "$1"
     exit 1
 }
 
 info() {
-    printf "%s\n" "$1"
+    printf '%s\n' "$1"
 }
 
 warn() {
-    printf "⚠️  \x1b[33m%s\e[0m\n"  "$1"
+    printf '⚠️  \x1b[33m%s\e[0m\n'  "$1"
 }
 
 help() {
@@ -39,7 +39,7 @@ while getopts ":hd:" option; do
    esac
 done
 
-SUPPORTED_TARGETS="linux-386 linux-amd64 linux-arm linux-arm64 darwin-amd64 darwin-arm64 windows-386 windows-amd64 windows-arm64"
+SUPPORTED_TARGETS="linux-386 linux-amd64 linux-arm linux-arm64 darwin-amd64 darwin-arm64 windows-386.exe windows-amd64.exe windows-arm64.exe"
 
 validate_dependency() {
     if ! command -v "$1" >/dev/null; then
@@ -120,7 +120,8 @@ install() {
         error "${arch} builds for ${platform} are not available for Oh My Posh"
     fi
 
-    info "\n Installing oh-my-posh for ${target} in ${install_dir}"
+    info
+    info "Installing oh-my-posh for ${target} in ${install_dir}"
 
     executable=${install_dir}/oh-my-posh
     url=https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-${target}
@@ -135,33 +136,11 @@ install() {
 
     chmod +x "$executable"
 
-    # install themes in cache
-    cache_dir=$("$executable" cache path)
-
-    info "🎨 Installing oh-my-posh themes in ${cache_dir}/themes\n"
-
-    theme_dir="${cache_dir}/themes"
-    mkdir -p "$theme_dir"
-    zip_file="${cache_dir}/themes.zip"
-
-    url="https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/themes.zip"
-
-    http_response=$(curl -s -f -L $url -o "$zip_file" -w "%{http_code}")
-
-    if [ "$http_response" == "200" ] && [ -f "$zip_file" ]; then
-        unzip -o -q "$zip_file" -d "$theme_dir"
-        chmod u+rw "${theme_dir}/*.omp.*"
-        rm "$zip_file"
-    else
-        warn "Unable to download themes at ${url}\nPlease validate your curl, connection and/or proxy settings"
-    fi
-
-    info "🚀 Installation complete.\n\nYou can follow the instructions at https://ohmyposh.dev/docs/installation/prompt"
+    info "🚀 Installation complete."
+    info
+    info "You can follow the instructions at https://ohmyposh.dev/docs/installation/prompt"
     info "to setup your shell to use oh-my-posh."
-    if [ "$http_response" == "200" ]; then
-        info "\nIf you want to use a built-in theme, you can find them in the ${theme_dir} directory:"
-        info "  oh-my-posh init {shell} --config ${theme_dir}/{theme}.omp.json\n"
-    fi
+
 }
 
 detect_arch() {
@@ -189,7 +168,7 @@ detect_platform() {
   case "${platform}" in
     linux) platform="linux" ;;
     darwin) platform="darwin" ;;
-    win*|msys*|cygwin*) platform="windows" ;;
+    win*|msys*|cygwin*|mingw*) platform="windows" ;;
   esac
 
   printf '%s' "${platform}"
