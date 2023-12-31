@@ -35,6 +35,7 @@ WINGET_PACKAGE_LIST=( \
         "Microsoft.WindowsTerminal" \
         "OBSProject.OBSStudio" \
         "Piriform.Speccy" \
+        "OpenJS.NodeJS.LTS" \
         "Python.Python.3.11" \
         "TeamViewer.TeamViewer" \
         "Twilio.Authy" \

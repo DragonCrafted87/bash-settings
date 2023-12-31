@@ -1,5 +1,7 @@
 #!/bin/bash
 
+OMP_INSTALL_DIR="/usr/local/bin"
+
 case "$OSTYPE" in
     linux*)
         [[ -t 1 ]] && echo "Linux"
@@ -14,6 +16,7 @@ case "$OSTYPE" in
             echo "Upgrade distro"
             sudo do-release-upgrade
         }
+
         ;;
 
     win*|msys*|cygwin*)
@@ -22,8 +25,15 @@ case "$OSTYPE" in
         PATH=$PATH:$BASE_PATH
         PATH="$PATH:/c/Program Files/Docker/Docker/resources/bin/"
         export PATH
+
+        OMP_INSTALL_DIR="$HOME/bin"
         ;;
     *)
         [[ -t 1 ]] && echo "unknown: $OSTYPE"
         ;;
 esac
+
+install-omp ()
+{
+    bash "${PATH_BASH_SETTINGS}/scripts/install-omp.sh" -d "$OMP_INSTALL_DIR"
+}

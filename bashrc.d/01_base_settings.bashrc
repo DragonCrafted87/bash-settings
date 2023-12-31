@@ -30,6 +30,12 @@ export EDITOR="$VISUAL"
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
+temp=$(realpath "${BASH_SOURCE[0]}")
+temp=$(dirname "$temp")
+temp=$(realpath "${temp}/..")
+export PATH_BASH_SETTINGS="$temp"
+echo "$PATH_BASH_SETTINGS"
+
 
 export GOPATH=$HOME/go
 
