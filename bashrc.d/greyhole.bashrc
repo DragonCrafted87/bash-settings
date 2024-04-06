@@ -48,8 +48,14 @@ function gh-activity-logs ()
     gh-command greyhole --logs
 }
 
-function gh-delete-pod ()
+function gh-delete-storage-pod ()
 {
     kubectl delete -n storage pod \
         "$(kubectl get -n storage pod --selector=role=greyhole -o jsonpath='{.items..metadata.name}')"
+}
+
+function gh-delete-cron-pods ()
+{
+    kubectl delete -n storage pod \
+        "$(kubectl get -n storage pod --selector=app=greyhole-cron -o jsonpath='{.items..metadata.name}')"
 }

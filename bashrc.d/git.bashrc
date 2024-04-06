@@ -2,8 +2,21 @@
 
 DEPTH_TO_SEARCH=3
 
-alias pre-commit-check='pre-commit run --all-files'
+alias pre-commit-check='MSYS_NO_PATHCONV=1 \
+    docker run \
+    --rm \
+    --name "$NAME" \
+    --env FULL_CHECK=True \
+    --volume "$(pwd)":/src \
+    ghcr.io/dragoncrafted87/alpine-common-pre-commit-hooks'
 alias pre-commit-update='pre-commit autoupdate'
+
+function git-delete-tags ()
+{
+    set -e
+    git tag --delete "$1"
+    git push --delete origin "$1"
+}
 
 function git-push-tags ()
 {

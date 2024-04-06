@@ -38,6 +38,8 @@ WINGET_PACKAGE_LIST=( \
         "TeamViewer.TeamViewer" \
         "Twilio.Authy" \
         "Valve.Steam" \
+        "CrystalDewWorld.CrystalDiskMark" \
+        "CrystalDewWorld.CrystalDiskInfo" \
     )
 
 WINGET_INSTALL_LIST=( \
