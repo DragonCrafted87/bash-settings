@@ -12,6 +12,7 @@ USER=$(whoami)
 WINGET_PACKAGE_LIST=( \
         "7zip.7zip" \
         "BellSoft.LibericaJDK.17.Full" \
+        "Brave.Brave" \
         "BraveSoftware.BraveBrowser" \
         "Discord.Discord" \
         "Docker.DockerDesktop" \
@@ -33,6 +34,7 @@ WINGET_PACKAGE_LIST=( \
         "Microsoft.VisualStudioCode" \
         "Microsoft.WindowsTerminal" \
         "OBSProject.OBSStudio" \
+        "Piriform.Speccy" \
         "OpenJS.NodeJS.LTS" \
         "Python.Python.3.11" \
         "TeamViewer.TeamViewer" \
