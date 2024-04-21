@@ -26,3 +26,8 @@ function k8s-apply-all ()
 {
     kubectl.exe apply -f . --recursive
 }
+
+function k8s-delete-all ()
+{
+    kubectl.exe delete -f . --recursive
+}
