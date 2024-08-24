@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OMP_INSTALL_DIR="/usr/local/bin"
+OMP_INSTALL_DIR="$HOME/bin"
 
 case "$OSTYPE" in
     linux*)

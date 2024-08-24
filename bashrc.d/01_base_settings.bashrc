@@ -46,7 +46,7 @@ PATH=$PATH:$HOME/.local/bin
 PATH=$PATH:$HOME/scripts
 PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 PATH=$PATH:$HOME/bash-settings/scripts
-PATH=$HOME/ffmpeg/bin
+PATH=$PATH:$HOME/ffmpeg/bin
 PATH=$PATH:$BASE_PATH
 export PATH
 

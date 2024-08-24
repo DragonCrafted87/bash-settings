@@ -1,14 +1,14 @@
 #!/bin/bash
 
-function dns-pods ()
+function dns-unbound-pods ()
 {
     kubectl get -n dns pod --selector=role=unbound -o jsonpath='{.items..metadata.name}'
     echo ""
 }
 
-function dns-command ()
+function dns-unbound-command ()
 {
-    IFS=' ' read -r -a array <<< "$(dns-pods)"
+    IFS=' ' read -r -a array <<< "$(dns-unbound-pods)"
     for element in "${array[@]}"
     do
         echo "$element"
@@ -17,15 +17,15 @@ function dns-command ()
     done
 }
 
-function dns-describe-pods ()
+function dns-unbound-describe-pods ()
 {
-    pods=$(dns-pods)
+    pods=$(dns-unbound-pods)
     kubectl describe -n dns pod "$pods"
 }
 
-function dns-pod-logs ()
+function dns-unbound-pod-logs ()
 {
-    IFS=' ' read -r -a array <<< "$(dns-pods)"
+    IFS=' ' read -r -a array <<< "$(dns-unbound-pods)"
     for element in "${array[@]}"
     do
         echo "$element"
@@ -36,9 +36,53 @@ function dns-pod-logs ()
     done
 }
 
-function dns-delete-all-pods ()
+function dns-unbound-delete-all-pods ()
 {
-    pods=$(dns-pods)
+    pods=$(dns-unbound-pods)
+    # shellcheck disable=SC2086
+    kubectl delete -n dns pod $pods
+}
+
+
+function dns-bind-pods ()
+{
+    kubectl get -n dns pod --selector=role=bind -o jsonpath='{.items..metadata.name}'
+    echo ""
+}
+
+function dns-bind-command ()
+{
+    IFS=' ' read -r -a array <<< "$(dns-bind-pods)"
+    for element in "${array[@]}"
+    do
+        echo "$element"
+        kubectl exec -it -n dns "$element" \
+            --  "$@"
+    done
+}
+
+function dns-bind-describe-pods ()
+{
+    pods=$(dns-bind-pods)
+    kubectl describe -n dns pod "$pods"
+}
+
+function dns-bind-pod-logs ()
+{
+    IFS=' ' read -r -a array <<< "$(dns-bind-pods)"
+    for element in "${array[@]}"
+    do
+        echo "$element"
+        kubectl logs -n dns "$element"
+        echo
+        echo
+        echo
+    done
+}
+
+function dns-bind-delete-all-pods ()
+{
+    pods=$(dns-bind-pods)
     # shellcheck disable=SC2086
     kubectl delete -n dns pod $pods
 }

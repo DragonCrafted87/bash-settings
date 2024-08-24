@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# shellcheck disable=SC1091
+source /etc/profile
+
 for file in ~/.bashrc.d/*.bashrc;
 do
     # shellcheck disable=SC1090
