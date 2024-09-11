@@ -9,4 +9,4 @@ net start nfsclnt
 Remove-Item -Path Alias:mount -ErrorAction Ignore
 
 umount.exe -f -a
-mount.exe 192.168.0.1:/srv/data y:
+mount.exe castellan.stealthdragonland.net:/srv/data y:

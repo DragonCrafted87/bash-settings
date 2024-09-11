@@ -126,6 +126,9 @@ def video_crop_encode(input_filename, output_filename):
             process_args.append("-map")
             process_args.append("0:v:1")
 
+        if "data" in codec_types:
+            codec_types.remove("data")
+
         if len(codec_types) != 0:
             raise Exception("We got extra unhandled streams")
 
