@@ -14,6 +14,23 @@
         },
         {
             "args": [
+                "video-merge",
+                "-i",
+                "The_Return_of_the_King_PT_1_t04.mkv",
+                "The_Return_of_the_King_PT_2_t04.mkv",
+                "-o",
+                "The Return of the King (2003) {imdb-tt0167260} - Extended Cut.mkv"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "S:/Media/new-unsorted/",
+            "justMyCode": true,
+            "name": "Python: ffmpeg video merge",
+            "program": "${workspaceFolder}/scripts/ffmpeg.py",
+            "request": "launch",
+            "type": "python"
+        },
+        {
+            "args": [
                 "~/bash-settings/scripts/mc_modlist.conf",
                 "D:/Games/MultiMC/instances/Fabric_Primary/.minecraft",
                 "1.19.3"

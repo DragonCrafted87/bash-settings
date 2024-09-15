@@ -7,13 +7,18 @@ from concurrent.futures import as_completed as futures_as_completed
 from glob import glob
 from json import load as read_json_file
 from json import loads as read_json
+from ntpath import basename
+from os import close as close_file_descriptor
+from os import getcwd
 from os import makedirs
+from os import remove
 from os import rename
 from os.path import dirname
 from pathlib import Path
 from pprint import pprint
 from shutil import rmtree as rmdir
 from subprocess import run
+from tempfile import mkstemp as make_temp_file
 
 # 3rd party libraries
 from requests import get as http_get  # pylint: disable=import-error
@@ -37,6 +42,165 @@ def run_process(args, debug=False):
     process.check_returncode()
 
     return process
+
+
+def get_chapter_list(input_filename):
+    process_args = [
+        "ffprobe",
+        "-v",
+        "quiet",
+        "-print_format",
+        "json",
+        "-show_chapters",
+        input_filename,
+    ]
+
+    process = run_process(process_args)
+    probe_data = read_json(process.stdout)
+
+    chapters = list(
+        map(
+            lambda c: {
+                "index": c["id"],
+                "start": float(c["start_time"]),
+                "end": float(c["end_time"]),
+            },
+            probe_data["chapters"],
+        )
+    )
+
+    return list(chapters)
+
+
+def offset_chapter_list(chapter_list, time_offset, chapter_offset):
+    for chapter in chapter_list:
+        chapter["start"] = chapter["start"] + time_offset
+        chapter["end"] = chapter["end"] + time_offset
+        chapter_offset += 1
+        chapter["title"] = f"Chapter {chapter_offset}"
+    return chapter_offset
+
+
+def get_file_duration(input_filename):
+    process_args = [
+        "ffprobe",
+        "-v",
+        "quiet",
+        "-print_format",
+        "json",
+        "-show_entries",
+        "format=duration",
+        input_filename,
+    ]
+
+    process = run_process(process_args)
+    probe_data = read_json(process.stdout)
+
+    return float(probe_data["format"]["duration"])
+
+
+def get_file_raw_metadata(input_filename):
+    process_args = ["ffmpeg", "-i", input_filename, "-f", "ffmetadata", "-"]
+
+    process = run_process(process_args)
+    raw_metadata = process.stdout.splitlines()
+
+    return_value = [";FFMETADATA1"]
+
+    for line in raw_metadata:
+        if line.startswith("[CHAPTER]"):
+            break
+        if line.startswith("encoder"):
+            return_value.append(line)
+    return return_value
+
+
+def append_chapter_list_to_metadata(metadata, chapter_list):
+    for chapter in chapter_list:
+        metadata.append("[CHAPTER]")
+        metadata.append("TIMEBASE=1/1000")
+        metadata.append(f"START={int(chapter['start'] * 1000)}")
+        metadata.append(f"END={int(chapter['end'] * 1000)}")
+        metadata.append(f"title={chapter['title']}")
+
+
+# pylint: disable=too-many-locals
+def video_append(input_filenames, output_filename):
+    fd, temp_name = make_temp_file(dir=getcwd())
+    close_file_descriptor(fd)
+    temp_file_list_name = basename(temp_name)
+
+    fd, temp_name = make_temp_file(dir=getcwd())
+    close_file_descriptor(fd)
+    temp_metadata_name = basename(temp_name)
+
+    try:
+        print(f"Merging: {input_filenames} into {output_filename}")
+
+        #    video_codec="copy"
+        #    audio_codec="copy"
+
+        metadata = None
+
+        previous_total_duration = 0
+        previous_final_chapter = 0
+
+        with open(temp_file_list_name, "w", encoding="utf8") as temp_file_list_file:
+            for input_file in input_filenames:
+                print(f"file {input_file}", file=temp_file_list_file, flush=True)
+                current_chapter_list = get_chapter_list(input_file)
+                current_file_duration = get_file_duration(input_file)
+                if previous_total_duration == 0:
+                    metadata = get_file_raw_metadata(input_file)
+
+                previous_final_chapter = offset_chapter_list(
+                    current_chapter_list,
+                    previous_total_duration,
+                    previous_final_chapter,
+                )
+                previous_total_duration += current_file_duration
+
+                append_chapter_list_to_metadata(metadata, current_chapter_list)
+
+        with open(temp_metadata_name, "w", encoding="utf8") as temp_metadata_file:
+            for line in metadata:
+                print(line, file=temp_metadata_file, flush=True)
+
+        process_args = [
+            "ffmpeg",
+            "-v",
+            "quiet",
+            "-f",
+            "concat",
+            "-safe",
+            "0",
+            "-i",
+            temp_file_list_name,
+            "-i",
+            temp_metadata_name,
+            "-map_metadata",
+            "1",
+            "-map",
+            "0",
+            "-c",
+            "copy",
+            output_filename,
+        ]
+        run_process(process_args, debug=True)
+
+        print(f"Moving Files: {input_filenames}")
+        for input_file in input_filenames:
+            rename(input_file, f"original/{input_file}")
+
+        return (False, f"Finished Processing {output_filename}")
+    except Exception as exc:  # pylint: disable=broad-except
+        print(f"{output_filename} generated an exception: {exc}")
+    finally:
+        temp_file_list_file.close()
+        temp_metadata_file.close()
+        remove(temp_file_list_name)
+        remove(temp_metadata_name)
+    return (False, f"Failed Processing {output_filename}")
 
 
 # pylint: disable=too-many-statements
@@ -89,10 +253,14 @@ def video_crop_encode(input_filename, output_filename):
         makedirs("original", exist_ok=True)
 
         print(f"Encoding: {input_filename}")
-        process_args = []
-        process_args.append("ffmpeg")
-        process_args.append("-i")
-        process_args.append(input_filename)
+        process_args = [
+            "ffmpeg",
+            "-v",
+            "quiet",
+            "-i",
+            input_filename,
+        ]
+
         process_args.append("-filter:v:0")
         process_args.append(f"crop={crop_value}")
         if "video" in codec_types:
@@ -421,32 +589,42 @@ def create_dvd(input_filename):
     return iso_name
 
 
+# pylint: disable=too-many-branches
 def main():
     parser = ArgumentParser(description="Get video information")
     parser.add_argument("command", help="What Are We Doin?")
-    parser.add_argument("-i", "--input_filename", help="Input filename")
+    parser.add_argument("-i", "--input_filenames", help="Input filename", nargs="*")
+    parser.add_argument("-o", "--output_filename", help="Output filename")
     args = parser.parse_args()
 
     print(args)
 
     if args.command == "video-crop-encode":
-        if not args.input_filename:
+        if not args.input_filenames:
             encode_all_video_files()
 
         else:
-            input_filename = args.input_filename
-            output_filename = args.input_filename.rsplit(".", 1)[0] + ".mkv"
+            for input_file in args.input_filenames:
+                output_filename = input_file.rsplit(".", 1)[0] + ".mkv"
+                video_crop_encode(input_file, output_filename)
 
-            video_crop_encode(input_filename, output_filename)
     elif args.command == "audio-split-encode":
-        if not args.input_filename:
+        if not args.input_filenames:
             encode_all_audio_files()
         else:
-            input_filename = args.input_filename
+            input_filename = args.input_filenames
             audio_split_encode(input_filename)
 
+    elif args.command == "video-merge-crop-encode":
+        continue_processing, _ = video_append(
+            args.input_filenames, args.output_filename
+        )
+        if continue_processing:
+            output_filename = input_file.rsplit(".", 1)[0] + ".mkv"
+            video_crop_encode(args.output_filename, output_filename)
+
     elif args.command == "make-dvd":
-        if not args.input_filename:
+        if not args.input_filenames:
             with ThreadPoolExecutor(max_workers=MAIN_WORKERS) as executor:
                 file_list = glob("*.mkv")
                 futures = []
@@ -459,7 +637,7 @@ def main():
                     res = future.result()
                     print("Processed job", idx, "result", res)
         else:
-            create_dvd(args.input_filename)
+            create_dvd(args.input_filenames)
 
 
 if __name__ == "__main__":
