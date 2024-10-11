@@ -23,6 +23,4 @@ function python-setup ()
         pre-commit \
         python-dateutil \
         requests
-
-
 }

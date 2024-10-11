@@ -13,7 +13,8 @@ WINGET_PACKAGE_LIST=( \
         "7zip.7zip" \
         "BellSoft.LibericaJDK.17.Full" \
         "Brave.Brave" \
-        "BraveSoftware.BraveBrowser" \
+        "CrystalDewWorld.CrystalDiskInfo" \
+        "CrystalDewWorld.CrystalDiskMark" \
         "Discord.Discord" \
         "Docker.DockerDesktop" \
         "EpicGames.EpicGamesLauncher" \
@@ -21,27 +22,21 @@ WINGET_PACKAGE_LIST=( \
         "File-New-Project.EarTrumpet" \
         "Foxit.FoxitReader" \
         "GIMP.GIMP" \
-        "Git.Git" \
         "GOG.Galaxy" \
         "GuinpinSoft.MakeMKV" \
         "Inkscape.Inkscape" \
         "JAMSoftware.TreeSize.Free" \
-        "JFrog.Conan" \
         "KDE.Kdenlive" \
-        "Kitware.CMake" \
         "Klocman.BulkCrapUninstaller" \
         "Logitech.GHUB" \
+        "Meta.Oculus" \
         "Microsoft.VisualStudioCode" \
-        "Microsoft.WindowsTerminal" \
         "OBSProject.OBSStudio" \
-        "Piriform.Speccy" \
         "OpenJS.NodeJS.LTS" \
+        "Piriform.Speccy" \
         "Python.Python.3.11" \
-        "TeamViewer.TeamViewer" \
-        "Twilio.Authy" \
         "Valve.Steam" \
-        "CrystalDewWorld.CrystalDiskMark" \
-        "CrystalDewWorld.CrystalDiskInfo" \
+        "VideoLAN.VLC" \
     )
 
 WINGET_INSTALL_LIST=( \
