@@ -28,6 +28,7 @@ alias replacecpp='find ${PWD} -name "*.cpp" | xargs perl -pi -e '
 alias replaceh='find ${PWD} -name "*.h" | xargs perl -pi -e '
 
 alias ps-parents='ps axo stat,ppid,pid,comm | grep -w defunct'
+alias pwsh='powershell'
 
 function base_find ()
 {
