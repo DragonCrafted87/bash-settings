@@ -23,11 +23,13 @@ if ! command -v zypper &> /dev/null; then
 fi
 
 # Ensure required commands are installed
-for cmd in wicked iwlist wpa_supplicant; do
+for cmd_pkg in "wicked:wicked" "iwlist:wireless-tools" "wpa_supplicant:wpa_supplicant"; do
+    cmd=${cmd_pkg%%:*}
+    pkg=${cmd_pkg#*:}
     if ! command -v "$cmd" &> /dev/null; then
-        echo "$cmd is not installed. Attempting to install..."
-        sudo zypper install -y "$cmd" || {
-            echo "Error: Failed to install $cmd. Please install it manually."
+        echo "$cmd is not installed. Attempting to install $pkg..."
+        sudo zypper install -y "$pkg" || {
+            echo "Error: Failed to install $pkg. Please install it manually."
             exit 1
         }
     fi
@@ -45,6 +47,7 @@ echo "Wireless interface found: $WLAN_IFACE"
 
 # Scan for available Wi-Fi networks
 echo "Scanning for available Wi-Fi networks..."
+sudo ip link set "$WLAN_IFACE" up
 sudo iwlist "$WLAN_IFACE" scan > /dev/null 2>&1 || {
     echo "Error: Failed to scan for Wi-Fi networks. Ensure the wireless interface is up."
     echo "Try 'sudo ip link set $WLAN_IFACE up' and re-run the script."
