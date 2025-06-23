@@ -1,10 +1,14 @@
 #!/bin/bash
 
-# Script to set up WLAN to autoconnect on openSUSE Leap 15.6
+# Script to set up WLAN to autoconnect on openSUSE Leap 15.6 using wicked
 # Run as the 'dragon' user with sudo privileges
 
 # Exit on error
 set -e
+
+# Variables
+NETWORK_CONFIG_DIR="/etc/sysconfig/network"
+WPA_SUPPLICANT_CONF="/etc/wpa_supplicant.conf"
 
 # Check if running as the 'dragon' user and not root
 if [ "$(id -u)" -eq 0 ] || [ "$(whoami)" != "dragon" ]; then
@@ -18,27 +22,20 @@ if ! command -v zypper &> /dev/null; then
     exit 1
 fi
 
-# Ensure nmcli is installed
-if ! command -v nmcli &> /dev/null; then
-    echo "nmcli is not installed. Attempting to install NetworkManager..."
-    sudo zypper install -y NetworkManager || {
-        echo "Error: Failed to install NetworkManager. Please install it manually."
-        exit 1
-    }
-    echo "nmcli is available"
-fi
-
-# Ensure NetworkManager is enabled and running
-sudo systemctl enable NetworkManager
-sudo systemctl start NetworkManager
-if ! systemctl is-active --quiet NetworkManager; then
-    echo "Error: NetworkManager failed to start"
-    exit 1
-fi
-echo "NetworkManager is enabled and running"
+# Ensure required commands are installed
+for cmd in wicked iwlist wpa_supplicant; do
+    if ! command -v "$cmd" &> /dev/null; then
+        echo "$cmd is not installed. Attempting to install..."
+        sudo zypper install -y "$cmd" || {
+            echo "Error: Failed to install $cmd. Please install it manually."
+            exit 1
+        }
+    fi
+    echo "$cmd is available"
+done
 
 # Check for wireless interface
-WLAN_IFACE=$(nmcli -t -f DEVICE,TYPE dev | grep wifi | cut -d: -f1)
+WLAN_IFACE=$(ip link | grep -E '^[0-9]+: wlan' | awk '{print $2}' | sed 's/:$//' | head -n 1)
 if [ -z "$WLAN_IFACE" ]; then
     echo "Error: No wireless interface found. Please ensure your wireless adapter is working."
     echo "Run 'rfkill list' to check for blocks and 'rfkill unblock all' if needed."
@@ -48,7 +45,12 @@ echo "Wireless interface found: $WLAN_IFACE"
 
 # Scan for available Wi-Fi networks
 echo "Scanning for available Wi-Fi networks..."
-SSIDS=$(nmcli -t -f SSID,SIGNAL dev wifi list | grep -v '^$' | sort -t: -k2 -nr | awk -F: '{print $1}' | uniq)
+sudo iwlist "$WLAN_IFACE" scan > /dev/null 2>&1 || {
+    echo "Error: Failed to scan for Wi-Fi networks. Ensure the wireless interface is up."
+    echo "Try 'sudo ip link set $WLAN_IFACE up' and re-run the script."
+    exit 1
+}
+SSIDS=$(sudo iwlist "$WLAN_IFACE" scan | grep 'ESSID:' | sed 's/.*ESSID:"\([^"]*\)"/\1/' | sort | uniq | grep -v '^$')
 if [ -z "$SSIDS" ]; then
     echo "Error: No Wi-Fi networks found. Please ensure your wireless adapter is active."
     exit 1
@@ -65,38 +67,71 @@ select SSID in $SSIDS "Quit"; do
     break
 done
 
-# Check if the connection already exists
-if nmcli con show "$SSID" &> /dev/null; then
-    echo "Connection for $SSID already exists. Updating autoconnect settings..."
-    nmcli con mod "$SSID" connection.autoconnect yes
+# Prompt for Wi-Fi password
+read -sp "Enter Wi-Fi password for $SSID (leave blank for open network): " WLAN_PASSWORD
+echo
+
+# Generate interface configuration file
+IFCFG_FILE="$NETWORK_CONFIG_DIR/ifcfg-$SSID"
+if [ -f "$IFCFG_FILE" ]; then
+    echo "Configuration for $SSID already exists. Updating settings..."
 else
-    # Prompt for Wi-Fi password
-    read -sp "Enter Wi-Fi password for $SSID (leave blank for open network): " WLAN_PASSWORD
-    echo
-
-    echo "Creating new connection for $SSID..."
-    if [ -n "$WLAN_PASSWORD" ]; then
-        # Configure WPA-PSK secured network
-        nmcli con add type wifi con-name "$SSID" ssid "$SSID" ifname "$WLAN_IFACE" \
-            wifi-sec.key-mgmt wpa-psk wifi-sec.psk "$WLAN_PASSWORD" connection.autoconnect yes || {
-            echo "Error: Failed to create WLAN connection for $SSID"
-            exit 1
-        }
-    else
-        # Configure open network
-        nmcli con add type wifi con-name "$SSID" ssid "$SSID" ifname "$WLAN_IFACE" \
-            connection.autoconnect yes || {
-            echo "Error: Failed to create WLAN connection for $SSID"
-            exit 1
-        }
-    fi
+    echo "Creating new configuration for $SSID..."
 fi
-echo "WLAN connection for $SSID configured to autoconnect"
 
-# Attempt to bring up the connection
-echo "Attempting to connect to $SSID..."
-nmcli con up "$SSID" || {
+# Write interface configuration
+sudo tee "$IFCFG_FILE" > /dev/null << EOF
+BOOTPROTO='dhcp'
+STARTMODE='auto'
+WIRELESS='yes'
+WIRELESS_ESSID='$SSID'
+WIRELESS_MODE='Managed'
+EOF
+
+# Configure WPA-PSK if password provided
+if [ -n "$WLAN_PASSWORD" ]; then
+    echo "Configuring WPA-PSK for $SSID..."
+    sudo tee -a "$IFCFG_FILE" > /dev/null << EOF
+WIRELESS_AUTH_MODE='psk'
+WIRELESS_WPA_PSK='$WLAN_PASSWORD'
+EOF
+    # Update wpa_supplicant.conf
+    if ! grep -q "ssid=\"$SSID\"" "$WPA_SUPPLICANT_CONF" 2>/dev/null; then
+        sudo tee -a "$WPA_SUPPLICANT_CONF" > /dev/null << EOF
+network={
+    ssid="$SSID"
+    psk="$WLAN_PASSWORD"
+    key_mgmt=WPA-PSK
+}
+EOF
+    fi
+else
+    echo "Configuring open network for $SSID..."
+fi
+
+# Ensure correct permissions
+sudo chmod 600 "$IFCFG_FILE"
+sudo chmod 600 "$WPA_SUPPLICANT_CONF" 2>/dev/null || true
+
+# Ensure wicked and wpa_supplicant services are enabled
+sudo systemctl enable wicked
+sudo systemctl enable wpa_supplicant
+sudo systemctl start wicked
+sudo systemctl start wpa_supplicant
+if ! systemctl is-active --quiet wicked; then
+    echo "Error: wicked service failed to start"
+    exit 1
+fi
+if ! systemctl is-active --quiet wpa_supplicant; then
+    echo "Error: wpa_supplicant service failed to start"
+    exit 1
+fi
+echo "wicked and wpa_supplicant services are running"
+
+# Bring up the interface
+echo "Bringing up interface $WLAN_IFACE for $SSID..."
+sudo wicked ifup "$WLAN_IFACE" || {
     echo "Warning: Failed to connect to $SSID. Please check the password or network availability."
 }
 
-echo "Wi-Fi setup complete. Reboot or run 'nmcli con up \"$SSID\"' to test connectivity."
+echo "Wi-Fi setup complete. Reboot or run 'sudo wicked ifup $WLAN_IFACE' to test connectivity."
