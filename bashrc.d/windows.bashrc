@@ -37,6 +37,7 @@ WINGET_PACKAGE_LIST=( \
         "Python.Python.3.11" \
         "Valve.Steam" \
         "VideoLAN.VLC" \
+        "agalwood.Motrix" \
     )
 
 WINGET_INSTALL_LIST=( \
