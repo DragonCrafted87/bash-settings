@@ -53,18 +53,34 @@ sudo iwlist "$WLAN_IFACE" scan > /dev/null 2>&1 || {
     echo "Try 'sudo ip link set $WLAN_IFACE up' and re-run the script."
     exit 1
 }
-SSIDS=$(sudo iwlist "$WLAN_IFACE" scan | grep 'ESSID:' | sed 's/.*ESSID:"\([^"]*\)"/\1/' | sort | uniq | grep -v '^$')
-if [ -z "$SSIDS" ]; then
+
+# Parse SSIDs into an array to preserve spaces
+declare -a SSIDS
+while IFS= read -r line; do
+    if [[ "$line" =~ ESSID: ]]; then
+        SSID=$(echo "$line" | sed 's/.*ESSID:"\([^"]*\)"/\1/' | grep -v '^$')
+        if [ -n "$SSID" ]; then
+            SSIDS+=("$SSID")
+        fi
+    fi
+done < <(sudo iwlist "$WLAN_IFACE" scan)
+SSIDS=($(printf "%s\n" "${SSIDS[@]}" | sort | uniq))
+
+if [ ${#SSIDS[@]} -eq 0 ]; then
     echo "Error: No Wi-Fi networks found. Please ensure your wireless adapter is active."
     exit 1
 fi
 
 # Display SSIDs with numbers
 echo "Available Wi-Fi networks:"
-select SSID in $SSIDS "Quit"; do
+select SSID in "${SSIDS[@]}" "Quit"; do
     if [ "$SSID" = "Quit" ] || [ -z "$SSID" ]; then
         echo "Exiting without configuring Wi-Fi."
         exit 0
+    fi
+    if [[ ! " ${SSIDS[@]} " =~ " $SSID " ]]; then
+        echo "Error: Invalid selection. Please choose a valid SSID."
+        continue
     fi
     echo "Selected SSID: $SSID"
     break
