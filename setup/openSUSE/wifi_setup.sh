@@ -22,18 +22,14 @@ if ! command -v zypper &> /dev/null; then
     exit 1
 fi
 
-# Ensure required commands are installed
-for cmd_pkg in "wicked:wicked" "iwlist:wireless-tools" "wpa_supplicant:wpa_supplicant"; do
-    cmd=${cmd_pkg%%:*}
-    pkg=${cmd_pkg#*:}
-    if ! command -v "$cmd" &> /dev/null; then
-        echo "$cmd is not installed. Attempting to install $pkg..."
-        sudo zypper install -y "$pkg" || {
-            echo "Error: Failed to install $pkg. Please install it manually."
-            exit 1
-        }
-    fi
-    echo "$cmd is available"
+# Ensure required packages are installed
+for pkg in wicked wireless-tools wpa_supplicant; do
+    echo "Checking if $pkg is installed..."
+    sudo zypper install -y "$pkg" || {
+        echo "Error: Failed to install $pkg. Please install it manually."
+        exit 1
+    }
+    echo "$pkg is installed or already present"
 done
 
 # Check for wireless interface
@@ -45,16 +41,21 @@ if [ -z "$WLAN_IFACE" ]; then
 fi
 echo "Wireless interface found: $WLAN_IFACE"
 
+# Bring up the wireless interface
+echo "Bringing up wireless interface $WLAN_IFACE..."
+sudo ip link set "$WLAN_IFACE" up
+sleep 2  # Wait for the interface to initialize
+
 # Scan for available Wi-Fi networks
 echo "Scanning for available Wi-Fi networks..."
-sudo ip link set "$WLAN_IFACE" up
-sudo iwlist "$WLAN_IFACE" scan > /dev/null 2>&1 || {
-    echo "Error: Failed to scan for Wi-Fi networks. Ensure the wireless interface is up."
-    echo "Try 'sudo ip link set $WLAN_IFACE up' and re-run the script."
+SCAN_OUTPUT=$(sudo iwlist "$WLAN_IFACE" scan 2>&1)
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to scan for Wi-Fi networks. Output:"
+    echo "$SCAN_OUTPUT"
     exit 1
-}
+fi
 
-# Parse SSIDs into an array to preserve spaces
+# Parse SSIDs from SCAN_OUTPUT
 declare -a SSIDS
 while IFS= read -r line; do
     if [[ "$line" =~ ESSID: ]]; then
@@ -63,7 +64,7 @@ while IFS= read -r line; do
             SSIDS+=("$SSID")
         fi
     fi
-done < <(sudo iwlist "$WLAN_IFACE" scan)
+done <<< "$SCAN_OUTPUT"
 SSIDS=($(printf "%s\n" "${SSIDS[@]}" | sort | uniq))
 
 if [ ${#SSIDS[@]} -eq 0 ]; then
