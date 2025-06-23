@@ -10,7 +10,7 @@ fi
 USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
 
 # Install Sway and basic utilities
-zypper install -y sway-branding-openSUSE alacritty wofi waybar grim light networkmanager-applet
+zypper install -y patterns-sway-sway
 
 # Create the Sway configuration directory if it doesn't exist
 if [ ! -d "$USER_HOME/.config/sway" ]; then
