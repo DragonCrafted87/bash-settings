@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to deploy network-wait service, install htop and boinc, and deploy boinc configuration script on openSUSE Leap 15.6
+# Script to deploy network-wait service, install htop and boinc, deploy boinc scripts, and configure BOINC RPC on openSUSE Leap 15.6
 # Idempotent: checks for existing files, packages, and service states
 # Run with sudo from setup/openSUSE/ directory or specify repository path
 
@@ -9,13 +9,17 @@ set -e
 REPO_DIR="$(dirname "$(realpath "$0")")"
 SERVICE_SRC="${REPO_DIR}/systemd/network-wait.service"
 SCRIPT_SRC="${REPO_DIR}/systemd/wait-for-network.sh"
-BOINC_SCRIPT_SRC="${REPO_DIR}/boinc/boinc-config.sh"
+BOINC_CONFIG_SRC="${REPO_DIR}/boinc/boinc-config.sh"
+BOINC_STATUS_SRC="${REPO_DIR}/boinc/boinc-status.sh"
 SERVICE_DEST="/etc/systemd/system/network-wait.service"
 SCRIPT_DEST="/usr/local/bin/wait-for-network.sh"
-BOINC_SCRIPT_DEST="/usr/local/bin/boinc-config.sh"
+BOINC_CONFIG_DEST="/usr/local/bin/boinc-config.sh"
+BOINC_STATUS_DEST="/usr/local/bin/boinc-status.sh"
+BOINC_DIR="/var/lib/boinc"
+RPC_AUTH_FILE="${BOINC_DIR}/gui_rpc_auth.cfg"
 
 # Check if source files exist
-for SRC in "$SERVICE_SRC" "$SCRIPT_SRC" "$BOINC_SCRIPT_SRC"; do
+for SRC in "$SERVICE_SRC" "$SCRIPT_SRC" "$BOINC_CONFIG_SRC" "$BOINC_STATUS_SRC"; do
     if [ ! -f "$SRC" ]; then
         echo "Error: $SRC not found"
         exit 1
@@ -31,12 +35,27 @@ else
     echo "htop and boinc-client are already installed"
 fi
 
+# Configure BOINC RPC authentication
+echo "Checking BOINC RPC configuration..."
+if [ ! -f "$RPC_AUTH_FILE" ]; then
+    echo "Creating $RPC_AUTH_FILE with random password..."
+    # Generate a random 32-character password
+    RPC_PASSWORD=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c32)
+    echo "$RPC_PASSWORD" > "$RPC_AUTH_FILE"
+    chown boinc:boinc "$RPC_AUTH_FILE"
+    chmod 640 "$RPC_AUTH_FILE"
+    echo "RPC password generated and configured"
+else
+    echo "$RPC_AUTH_FILE already exists"
+fi
+
 # Check and deploy files
 echo "Checking and deploying files..."
 declare -A FILE_PAIRS=(
     ["$SERVICE_SRC"]="$SERVICE_DEST"
     ["$SCRIPT_SRC"]="$SCRIPT_DEST"
-    ["$BOINC_SCRIPT_SRC"]="$BOINC_SCRIPT_DEST"
+    ["$BOINC_CONFIG_SRC"]="$BOINC_CONFIG_DEST"
+    ["$BOINC_STATUS_SRC"]="$BOINC_STATUS_DEST"
 )
 for SRC in "${!FILE_PAIRS[@]}"; do
     DEST="${FILE_PAIRS[$SRC]}"
@@ -49,8 +68,8 @@ for SRC in "${!FILE_PAIRS[@]}"; do
 done
 
 # Set permissions for scripts
-echo "Ensuring executable permissions for $SCRIPT_DEST and $BOINC_SCRIPT_DEST..."
-chmod +x "$SCRIPT_DEST" "$BOINC_SCRIPT_DEST"
+echo "Ensuring executable permissions for $SCRIPT_DEST, $BOINC_CONFIG_DEST, and $BOINC_STATUS_DEST..."
+chmod +x "$SCRIPT_DEST" "$BOINC_CONFIG_DEST" "$BOINC_STATUS_DEST"
 
 # Enable and start boinc-client service if not already enabled/started
 echo "Checking boinc-client service..."
@@ -84,6 +103,7 @@ systemctl status network-wait.service --no-pager
 echo "Checking boinc-client service status..."
 systemctl status boinc-client --no-pager
 
-echo "Setup complete. Run 'sudo /usr/local/bin/boinc-config.sh' to configure BOINC for Science United."
-echo "Reboot to test the network-wait service if changes were made."
+echo "Setup complete."
+echo "Run 'sudo /usr/local/bin/boinc-config.sh' to configure BOINC for Science United."
+echo "Run 'sudo /usr/local/bin/boinc-status.sh' to check BOINC status."
 exit 0

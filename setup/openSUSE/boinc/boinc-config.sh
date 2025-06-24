@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script to configure BOINC client to connect to Science United project
 # Idempotent: checks for existing connection and prompts to replace or skip
-# Handles RPC authentication for boinccmd
+# Uses RPC authentication for boinccmd
 # Prompts for user credentials and attaches to the project if needed
 
 # Science United project URL
@@ -21,13 +21,7 @@ fi
 
 # Check for gui_rpc_auth.cfg
 if [ ! -f "$RPC_AUTH_FILE" ]; then
-    echo "Error: $RPC_AUTH_FILE not found. BOINC RPC authentication is required."
-    echo "To fix this, generate the file or configure BOINC for passwordless RPC."
-    echo "1. Stop the BOINC client: 'sudo systemctl stop boinc-client'"
-    echo "2. Create $RPC_AUTH_FILE with a password (e.g., 'echo mypassword > $RPC_AUTH_FILE')"
-    echo "3. Set permissions: 'sudo chown boinc:boinc $RPC_AUTH_FILE; sudo chmod 640 $RPC_AUTH_FILE'"
-    echo "4. Start the BOINC client: 'sudo systemctl start boinc-client'"
-    echo "Then rerun this script."
+    echo "Error: $RPC_AUTH_FILE not found. Run 'sudo /usr/local/bin/secondary-setup.sh' to generate it."
     exit 1
 fi
 
@@ -44,7 +38,7 @@ if boinccmd --passwd "$RPC_PASSWORD" --get_project_status | grep -q "$PROJECT_UR
     echo "Do you want to replace the existing connection with new credentials? (y/n)"
     read -p "Enter your choice (y/n): " REPLACE
     if [[ ! "$REPLACE" =~ ^[Yy]$ ]]; then
-        echo "Skipping configuration. To manage projects, use 'boinccmd --project <url> <command>'."
+        echo "Skipping configuration. To manage projects, use 'boinccmd --passwd <password> --project <url> <command>'."
         exit 0
     fi
     echo "Detaching from existing Science United project..."
@@ -92,5 +86,5 @@ else
     exit 1
 fi
 
-echo "You can monitor BOINC tasks with 'boinccmd --passwd <rpc_password> --get_tasks' or install boinc-manager for a GUI."
+echo "You can monitor BOINC status with 'sudo /usr/local/bin/boinc-status.sh' or install boinc-manager for a GUI."
 exit 0
