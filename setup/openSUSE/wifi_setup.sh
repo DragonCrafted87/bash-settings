@@ -92,23 +92,23 @@ fi
 read -sp "Enter Wi-Fi password for $SSID (leave blank for open network): " WLAN_PASSWORD
 echo
 
-# Write interface configuration
+# Write interface configuration with double quotes for SSID
 echo "Creating or updating configuration for $SSID..."
 sudo tee "$IFCFG_FILE" > /dev/null << EOF
-NAME='$WLAN_IFACE'
+NAME="$WLAN_IFACE"
 BOOTPROTO='dhcp'
 STARTMODE='auto'
 WIRELESS='yes'
-WIRELESS_ESSID='$SSID'
+WIRELESS_ESSID="$SSID"
 WIRELESS_MODE='Managed'
 EOF
 
-# Configure WPA-PSK if password provided
+# Configure WPA-PSK if password provided, with double quotes for password
 if [ -n "$WLAN_PASSWORD" ]; then
     echo "Configuring WPA-PSK for $SSID..."
     sudo tee -a "$IFCFG_FILE" > /dev/null << EOF
 WIRELESS_AUTH_MODE='psk'
-WIRELESS_WPA_PSK='$WLAN_PASSWORD'
+WIRELESS_WPA_PSK="$WLAN_PASSWORD"
 EOF
 fi
 
