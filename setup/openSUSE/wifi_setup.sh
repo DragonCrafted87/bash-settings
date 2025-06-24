@@ -42,24 +42,26 @@ echo "Wireless interface found: $WLAN_IFACE"
 
 # Bring up the wireless interface and verify state
 echo "Bringing up wireless interface $WLAN_IFACE..."
+sudo ip link set "$WLAN_IFACE" down
+sleep 5
 sudo ip link set "$WLAN_IFACE" up
-sleep 5  # Increased sleep to ensure interface readiness
+sleep 5
 
-# Check interface state
-IFACE_STATE=$(ip link show "$WLAN_IFACE" | grep -o "state [A-Z]*" | awk '{print $2}')
-echo "Interface $WLAN_IFACE state: $IFACE_STATE"
-if [ "$IFACE_STATE" = "DOWN" ]; then
-    echo "Warning: Interface $WLAN_IFACE is still DOWN. Attempting to resolve..."
-    sudo rfkill unblock all
-    sudo ip link set "$WLAN_IFACE" up
-    sleep 5
-    IFACE_STATE=$(ip link show "$WLAN_IFACE" | grep -o "state [A-Z]*" | awk '{print $2}')
-    echo "Updated interface state: $IFACE_STATE"
-    if [ "$IFACE_STATE" = "DOWN" ]; then
-        echo "Error: Failed to bring $WLAN_IFACE up. Check hardware or driver issues."
-        exit 1
-    fi
-fi
+# # Check interface state
+# IFACE_STATE=$(ip link show "$WLAN_IFACE" | grep -o "state [A-Z]*" | awk '{print $2}')
+# echo "Interface $WLAN_IFACE state: $IFACE_STATE"
+# if [ "$IFACE_STATE" = "DOWN" ]; then
+#     echo "Warning: Interface $WLAN_IFACE is still DOWN. Attempting to resolve..."
+#     sudo rfkill unblock all
+#     sudo ip link set "$WLAN_IFACE" up
+#     sleep 5
+#     IFACE_STATE=$(ip link show "$WLAN_IFACE" | grep -o "state [A-Z]*" | awk '{print $2}')
+#     echo "Updated interface state: $IFACE_STATE"
+#     if [ "$IFACE_STATE" = "DOWN" ]; then
+#         echo "Error: Failed to bring $WLAN_IFACE up. Check hardware or driver issues."
+#         exit 1
+#     fi
+# fi
 
 # Scan for available Wi-Fi networks using iwlist
 echo "Scanning for available Wi-Fi networks with iwlist..."
