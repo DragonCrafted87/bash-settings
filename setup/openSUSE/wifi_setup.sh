@@ -3,9 +3,6 @@
 # Script to set up WLAN to autoconnect on openSUSE Leap 15.6 using wicked
 # Run as the 'dragon' user with sudo privileges
 
-# Exit on error
-set -e
-
 # Variables
 NETWORK_CONFIG_DIR="/etc/sysconfig/network"
 WPA_SUPPLICANT_CONF="/etc/wpa_supplicant.conf"
@@ -40,10 +37,10 @@ if [ -z "$WLAN_IFACE" ]; then
 fi
 echo "Wireless interface found: $WLAN_IFACE"
 
-# Bring up the wireless interface and verify state
+# Bring up the wireless interface
 echo "Bringing up wireless interface $WLAN_IFACE..."
 sudo ip link set "$WLAN_IFACE" up
-sleep 5
+sleep 5  # Wait for the interface to initialize
 
 # Scan for available Wi-Fi networks using iwlist
 echo "Scanning for available Wi-Fi networks with iwlist..."
@@ -57,38 +54,38 @@ if [ $SCAN_STATUS -ne 0 ]; then
     exit 1
 fi
 
-# Parse SSIDs from SCAN_OUTPUT into an array
-declare -a SSIDS
-while IFS= read -r line; do
-    if [[ "$line" =~ ESSID: ]]; then
-        SSID=$(echo "$line" | sed 's/.*ESSID:"\([^"]*\)"/\1/' | grep -v '^$')
-        if [ -n "$SSID" ]; then
-            SSIDS+=("$SSID")
-        fi
-    fi
-done <<< "$SCAN_OUTPUT"
+# Extract SSIDs into an array
+mapfile -t SSIDS < <(echo "$SCAN_OUTPUT" | grep 'ESSID:"' | sed 's/.*ESSID:"\([^"]*\)"/\1/' | grep -v '^$' | sort | uniq)
 
-# Remove duplicates
-mapfile -t SSIDS < <(printf "%s\n" "${SSIDS[@]}" | sort | uniq)
-
+# Check if any SSIDs were found
 if [ ${#SSIDS[@]} -eq 0 ]; then
     echo "Error: No Wi-Fi networks found. Ensure the adapter is active and networks are in range."
     exit 1
 fi
 
-# Display available SSIDs
-echo "Available Wi-Fi networks:"
-select SSID in "${SSIDS[@]}" "Quit"; do
-    if [ "$SSID" = "Quit" ]; then
-        echo "Exiting without configuring Wi-Fi."
-        exit 0
-    elif [ -n "$SSID" ]; then
-        echo "Selected SSID: $SSID"
-        break
-    else
-        echo "Invalid selection. Please choose a valid SSID."
-    fi
+# Debug: Print found SSIDs
+echo "Found ${#SSIDS[@]} SSIDs:"
+for ssid in "${SSIDS[@]}"; do
+    echo "- $ssid"
 done
+
+# Display available SSIDs and prompt for selection
+echo "Available Wi-Fi networks:"
+for i in "${!SSIDS[@]}"; do
+    echo "$((i+1))) ${SSIDS[$i]}"
+done
+echo "q) Quit"
+read -p "Select an SSID by number or 'q' to quit: " choice
+if [ "$choice" = "q" ]; then
+    echo "Exiting without configuring Wi-Fi."
+    exit 0
+elif [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le ${#SSIDS[@]} ]; then
+    SSID="${SSIDS[$((choice-1))]}"
+    echo "Selected SSID: $SSID"
+else
+    echo "Invalid selection."
+    exit 1
+fi
 
 # Prompt for Wi-Fi password
 read -sp "Enter Wi-Fi password for $SSID (leave blank for open network): " WLAN_PASSWORD
@@ -136,7 +133,7 @@ fi
 sudo chmod 600 "$IFCFG_FILE"
 sudo chmod 600 "$WPA_SUPPLICANT_CONF" 2>/dev/null || true
 
-# Ensure wicked and wpa_supplicant services are enabled
+# Ensure wicked and wpa_supplicant services are enabled and started
 sudo systemctl enable wicked
 sudo systemctl enable wpa_supplicant
 sudo systemctl start wicked
