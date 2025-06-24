@@ -31,9 +31,15 @@ else
     echo "htop and boinc-client are already installed"
 fi
 
-# Copy files to system locations only if they differ
+# Check and deploy files
 echo "Checking and deploying files..."
-for SRC DEST in "$SERVICE_SRC $SERVICE_DEST" "$SCRIPT_SRC $SCRIPT_DEST" "$BOINC_SCRIPT_SRC $BOINC_SCRIPT_DEST"; do
+declare -A FILE_PAIRS=(
+    ["$SERVICE_SRC"]="$SERVICE_DEST"
+    ["$SCRIPT_SRC"]="$SCRIPT_DEST"
+    ["$BOINC_SCRIPT_SRC"]="$BOINC_SCRIPT_DEST"
+)
+for SRC in "${!FILE_PAIRS[@]}"; do
+    DEST="${FILE_PAIRS[$SRC]}"
     if [ -f "$DEST" ] && cmp -s "$SRC" "$DEST"; then
         echo "$DEST is already up to date"
     else
