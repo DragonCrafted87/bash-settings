@@ -36,7 +36,13 @@ case "$HOSTNAME" in
 
             run_ssh_env;
 
-            ssh-add "$HOME"/.ssh/id_*;
+            # Add only private key files, excluding .pub and known non-key files
+            for key in "$HOME"/.ssh/id_*; do
+                # Skip if file is a .pub, directory, or known non-key file
+                if [[ -f "$key" && ! "$key" =~ \.pub$ && ! "$key" =~ (config|known_hosts|environment|authorized_keys)$ ]]; then
+                    ssh-add "$key"
+                fi
+            done
         }
 
         if [ -f "${SSH_ENV}" ]; then
