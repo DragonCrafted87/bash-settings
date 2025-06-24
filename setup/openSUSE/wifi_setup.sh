@@ -42,26 +42,8 @@ echo "Wireless interface found: $WLAN_IFACE"
 
 # Bring up the wireless interface and verify state
 echo "Bringing up wireless interface $WLAN_IFACE..."
-sudo ip link set "$WLAN_IFACE" down
-sleep 5
 sudo ip link set "$WLAN_IFACE" up
 sleep 5
-
-# # Check interface state
-# IFACE_STATE=$(ip link show "$WLAN_IFACE" | grep -o "state [A-Z]*" | awk '{print $2}')
-# echo "Interface $WLAN_IFACE state: $IFACE_STATE"
-# if [ "$IFACE_STATE" = "DOWN" ]; then
-#     echo "Warning: Interface $WLAN_IFACE is still DOWN. Attempting to resolve..."
-#     sudo rfkill unblock all
-#     sudo ip link set "$WLAN_IFACE" up
-#     sleep 5
-#     IFACE_STATE=$(ip link show "$WLAN_IFACE" | grep -o "state [A-Z]*" | awk '{print $2}')
-#     echo "Updated interface state: $IFACE_STATE"
-#     if [ "$IFACE_STATE" = "DOWN" ]; then
-#         echo "Error: Failed to bring $WLAN_IFACE up. Check hardware or driver issues."
-#         exit 1
-#     fi
-# fi
 
 # Scan for available Wi-Fi networks using iwlist
 echo "Scanning for available Wi-Fi networks with iwlist..."
@@ -72,40 +54,40 @@ echo "iwlist scan output:"
 echo "$SCAN_OUTPUT"
 if [ $SCAN_STATUS -ne 0 ]; then
     echo "Error: iwlist scan failed. See output above."
-    # Fallback to wpa_cli
-    echo "Attempting scan with wpa_cli..."
-    sudo wpa_supplicant -B -i "$WLAN_IFACE" -c /etc/wpa_supplicant.conf -P /var/run/wpa_supplicant-$WLAN_IFACE.pid 2>/dev/null
-    sleep 2
-    WPA_SCAN_OUTPUT=$(sudo wpa_cli -i "$WLAN_IFACE" scan && sudo wpa_cli -i "$WLAN_IFACE" scan_results 2>&1)
-    WPA_STATUS=$?
-    echo "wpa_cli scan status code: $WPA_STATUS"
-    echo "wpa_cli scan output:"
-    echo "$WPA_SCAN_OUTPUT"
-    if [ $WPA_STATUS -ne 0 ]; then
-        echo "Error: wpa_cli scan failed. See output above."
-        exit 1
-    fi
-    # Parse SSIDs from wpa_cli output
-    SSIDS=$(echo "$WPA_SCAN_OUTPUT" | awk 'NR>2 {print $NF}' | sort | uniq)
-else
-    # Parse SSIDs from iwlist output
-    SSIDS=$(echo "$SCAN_OUTPUT" | grep 'ESSID:' | sed 's/.*ESSID:"\([^"]*\)"/\1/' | sort | uniq)
+    exit 1
 fi
 
-if [ -z "$SSIDS" ]; then
+# Parse SSIDs from SCAN_OUTPUT into an array
+declare -a SSIDS
+while IFS= read -r line; do
+    if [[ "$line" =~ ESSID: ]]; then
+        SSID=$(echo "$line" | sed 's/.*ESSID:"\([^"]*\)"/\1/' | grep -v '^$')
+        if [ -n "$SSID" ]; then
+            SSIDS+=("$SSID")
+        fi
+    fi
+done <<< "$SCAN_OUTPUT"
+
+# Remove duplicates
+mapfile -t SSIDS < <(printf "%s\n" "${SSIDS[@]}" | sort | uniq)
+
+if [ ${#SSIDS[@]} -eq 0 ]; then
     echo "Error: No Wi-Fi networks found. Ensure the adapter is active and networks are in range."
     exit 1
 fi
 
 # Display available SSIDs
 echo "Available Wi-Fi networks:"
-select SSID in $SSIDS "Quit"; do
-    if [ "$SSID" = "Quit" ] || [ -z "$SSID" ]; then
+select SSID in "${SSIDS[@]}" "Quit"; do
+    if [ "$SSID" = "Quit" ]; then
         echo "Exiting without configuring Wi-Fi."
         exit 0
+    elif [ -n "$SSID" ]; then
+        echo "Selected SSID: $SSID"
+        break
+    else
+        echo "Invalid selection. Please choose a valid SSID."
     fi
-    echo "Selected SSID: $SSID"
-    break
 done
 
 # Prompt for Wi-Fi password
@@ -172,7 +154,7 @@ echo "wicked and wpa_supplicant services are running"
 # Bring up the interface
 echo "Bringing up interface $WLAN_IFACE for $SSID..."
 sudo wicked ifup "$WLAN_IFACE" || {
-    echo "Warning: Failed to connect to $SSID. Check password or network availability."
+    echo "Warning: Failed to connect to $SSID. Please check the password or network availability."
 }
 
 echo "Wi-Fi setup complete. Reboot or run 'sudo wicked ifup $WLAN_IFACE' to test connectivity."
