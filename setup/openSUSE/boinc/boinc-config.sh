@@ -21,7 +21,7 @@ fi
 
 # Check for gui_rpc_auth.cfg
 if [ ! -f "$RPC_AUTH_FILE" ]; then
-    echo "Error: $RPC_AUTH_FILE not found. Run 'sudo /usr/local/bin/secondary-setup.sh' to generate it."
+    echo "Error: $RPC_AUTH_FILE not found. Run 'sudo bash-settings\setup\openSUSE\secondary-setup.sh' to generate it."
     exit 1
 fi
 
@@ -33,17 +33,17 @@ if ! RPC_PASSWORD=$(cat "$RPC_AUTH_FILE"); then
 fi
 
 # Check if already attached to Science United
-if boinccmd --passwd "$RPC_PASSWORD" --get_project_status | grep -q "$PROJECT_URL"; then
+if boinccmd --passwd "$RPC_PASSWORD" --acct_mgr info | grep -q "$PROJECT_URL"; then
     echo "BOINC is already attached to Science United."
     echo "Do you want to replace the existing connection with new credentials? (y/n)"
     read -p "Enter your choice (y/n): " REPLACE
     if [[ ! "$REPLACE" =~ ^[Yy]$ ]]; then
-        echo "Skipping configuration. To manage projects, use 'boinccmd --passwd <password> --project <url> <command>'."
+        echo "Skipping configuration."
         exit 0
     fi
     echo "Detaching from existing Science United project..."
-    if ! boinccmd --passwd "$RPC_PASSWORD" --project "$PROJECT_URL" detach; then
-        echo "Error: Failed to detach from Science United. Check BOINC status with 'boinccmd --passwd <password> --get_project_status'."
+    if ! boinccmd --passwd "$RPC_PASSWORD" --acct_mgr detach; then
+        echo "Error: Failed to detach from Science United."
         exit 1
     fi
     echo "Detached successfully. Proceeding with new configuration..."
@@ -68,17 +68,15 @@ fi
 
 # Attempt to attach to the project
 echo "Attaching to Science United project..."
-if ! boinccmd --passwd "$RPC_PASSWORD" --project_attach "$PROJECT_URL" "$USERNAME" "$PASSWORD"; then
+if ! boinccmd --passwd "$RPC_PASSWORD" --acct_mgr attach "$PROJECT_URL" "$USERNAME" "$PASSWORD"; then
     echo "Error: Failed to attach to Science United. Please check your credentials or network connection."
-    echo "You can try again by running this script or manually with:"
-    echo "  boinccmd --passwd <rpc_password> --project_attach $PROJECT_URL <username> <password>"
     exit 1
 fi
 
 # Verify attachment
 echo "Verifying project attachment..."
 sleep 2 # Wait briefly for BOINC to update
-if boinccmd --passwd "$RPC_PASSWORD" --get_project_status | grep -q "$PROJECT_URL"; then
+if boinccmd --passwd "$RPC_PASSWORD" --acct_mgr info | grep -q "$PROJECT_URL"; then
     echo "Successfully attached to Science United!"
     echo "BOINC is now configured to contribute to Science United projects."
 else
