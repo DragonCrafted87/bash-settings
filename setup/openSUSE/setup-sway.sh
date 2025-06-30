@@ -13,11 +13,15 @@ sudo zypper install -y curl
 sudo rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
 sudo zypper addrepo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
 
-# Install sway and dependencies
-sudo zypper install -y sway wofi jq mpv python3-pip brave-browser
+# Install sway, audio, and other dependencies
+sudo zypper install -y sway sway-branding-openSUSE wofi jq mpv python3-pip brave-browser pipewire pipewire-pulse pipewire-alsa pavucontrol
 
 # Install jellyfin-mpv-shim
 sudo pip3 install --upgrade jellyfin-mpv-shim
+
+# Enable PipeWire user services for audio
+systemctl --user enable pipewire.service pipewire-pulse.service
+systemctl --user start pipewire.service pipewire-pulse.service
 
 # Set up Sway configuration
 mkdir -p ~/.config/sway
