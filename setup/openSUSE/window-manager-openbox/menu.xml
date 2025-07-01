@@ -1,0 +1,9 @@
+<openbox_menu>
+  <menu id="root-menu" label="Openbox 3">
+    <item label="Terminal">
+      <action name="Execute"><command>xterm</command></action>
+    </item>
+    <separator/>
+    <menu id="running-apps" label="Running Applications" execute="/usr/local/bin/running-apps-pipe-menu.sh" />
+  </menu>
+</openbox_menu>
