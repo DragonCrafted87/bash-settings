@@ -22,7 +22,6 @@ SSH_CONFIG="$SSH_DIR/config"
 SUDOERS_FILE="/etc/sudoers.d/dragon"
 TIMEZONE="America/Chicago"
 OH_MY_POSH_PATH="/usr/local/bin/oh-my-posh"
-OH_MY_POSH_INIT="$BASHRC_DIR_DEST/oh-my-posh.sh"
 
 # Check if running as the 'dragon' user and not root
 if [ "$(id -u)" -eq 0 ] || [ "$(whoami)" != "dragon" ]; then
@@ -127,18 +126,6 @@ if [ ! -x "$OH_MY_POSH_PATH" ]; then
     echo "oh-my-posh installed at $OH_MY_POSH_PATH"
 else
     echo "oh-my-posh is already installed at $OH_MY_POSH_PATH"
-fi
-
-# Set up oh-my-posh initialization if not already present
-if [ ! -f "$OH_MY_POSH_INIT" ]; then
-    cat << EOF > "$OH_MY_POSH_INIT"
-#!/bin/bash
-eval "\$($OH_MY_POSH_PATH init bash)"
-EOF
-    chmod +x "$OH_MY_POSH_INIT"
-    echo "oh-my-posh initialization set up in $OH_MY_POSH_INIT"
-else
-    echo "oh-my-posh initialization already exists in $OH_MY_POSH_INIT"
 fi
 
 # Set up root's bash environment
