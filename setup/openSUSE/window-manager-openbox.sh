@@ -12,8 +12,8 @@ set_boot_to_tty() {
 
 # Function to install necessary packages
 install_packages() {
-    sudo zypper install -y openbox obconf wmctrl feh xterm
-    echo "Installed Openbox and related packages."
+    sudo zypper install -y openbox obconf wmctrl feh xterm pavucontrol curl
+    echo "Installed Openbox, related packages, pavucontrol, and curl."
 }
 
 # Function to configure .xinitrc to start Openbox
@@ -22,11 +22,16 @@ configure_xinitrc() {
     echo "Configured .xinitrc to start Openbox."
 }
 
-# Function to set up the Openbox menu
-setup_openbox_menu() {
+# Function to set up Openbox configuration files
+setup_openbox_config() {
     mkdir -p ~/.config/openbox
     cp "$AUX_DIR/menu.xml" ~/.config/openbox/menu.xml
-    echo "Copied menu.xml to ~/.config/openbox/"
+    if [ -f ~/.config/openbox/rc.xml ]; then
+        cp ~/.config/openbox/rc.xml ~/.config/openbox/rc.xml.bak
+        echo "Backed up existing rc.xml to rc.xml.bak."
+    fi
+    cp "$AUX_DIR/rc.xml" ~/.config/openbox/rc.xml
+    echo "Copied menu.xml and rc.xml to ~/.config/openbox/"
 }
 
 # Function to check if Packman repository exists
@@ -57,6 +62,27 @@ install_multimedia_codecs() {
     echo "Installed multimedia codecs from Packman repository."
 }
 
+# Function to check if Brave repository exists
+check_brave_repo() {
+    zypper lr | grep -q "brave-browser"
+    return $?
+}
+
+# Function to install Brave browser
+install_brave_browser() {
+    if ! check_brave_repo; then
+        echo "Adding Brave browser repository..."
+        sudo zypper install -y curl
+        sudo rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
+        sudo zypper addrepo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+    else
+        echo "Brave browser repository already exists."
+    fi
+    echo "Installing Brave browser..."
+    sudo zypper install -y brave-browser
+    echo "Installed Brave browser."
+}
+
 # Function to place the running-apps-pipe-menu.sh script
 place_pipe_menu_script() {
     sudo cp "$AUX_DIR/running-apps-pipe-menu.sh" /usr/local/bin/
@@ -69,8 +95,9 @@ main() {
     set_boot_to_tty
     install_packages
     configure_xinitrc
-    setup_openbox_menu
+    setup_openbox_config
     install_multimedia_codecs
+    install_brave_browser
     place_pipe_menu_script
     echo "Openbox setup complete. To start Openbox, run 'startx' from the TTY."
 }
