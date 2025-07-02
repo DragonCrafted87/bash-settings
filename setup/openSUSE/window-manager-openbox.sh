@@ -29,10 +29,25 @@ setup_openbox_menu() {
     echo "Copied menu.xml to ~/.config/openbox/"
 }
 
+# Function to check if Packman repository exists
+check_packman_repo() {
+    zypper lr | grep -q "packman"
+    return $?
+}
+
+# Function to add Packman repository if it doesn't exist
+add_packman_repo() {
+    if ! check_packman_repo; then
+        echo "Adding Packman repository..."
+        sudo zypper addrepo -cfp 90 'https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Leap_15.6/' packman
+    else
+        echo "Packman repository already exists."
+    fi
+}
+
 # Function to install multimedia codecs from Packman
 install_multimedia_codecs() {
-    echo "Adding Packman repository..."
-    sudo zypper addrepo -cfp 90 'https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Leap_15.6/' packman
+    add_packman_repo
     echo "Refreshing repositories..."
     sudo zypper refresh
     echo "Switching system packages to Packman..."
