@@ -31,9 +31,14 @@ setup_openbox_menu() {
 
 # Function to install multimedia codecs from Packman
 install_multimedia_codecs() {
+    echo "Adding Packman repository..."
     sudo zypper addrepo -cfp 90 'https://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Leap_15.6/' packman
+    echo "Refreshing repositories..."
     sudo zypper refresh
-    sudo zypper install --allow-vendor-change ffmpeg gstreamer-plugins-{good,bad,ugly,libav} libavcodec-full vlc-codecs
+    echo "Switching system packages to Packman..."
+    sudo zypper dup --allow-vendor-change --from packman
+    echo "Installing multimedia codecs from Packman..."
+    sudo zypper install --allow-vendor-change --from packman ffmpeg gstreamer-plugins-{good,bad,ugly,libav} libavcodec-full vlc-codecs
     echo "Installed multimedia codecs from Packman repository."
 }
 
