@@ -32,8 +32,3 @@ case "$OSTYPE" in
         [[ -t 1 ]] && echo "unknown: $OSTYPE"
         ;;
 esac
-
-install-omp ()
-{
-    bash "${PATH_BASH_SETTINGS}/scripts/install-omp.sh" -d "$OMP_INSTALL_DIR"
-}
