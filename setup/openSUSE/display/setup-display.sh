@@ -71,12 +71,12 @@ if [ "$WITH_DISPLAY_IDLE" = true ]; then
     fi
     echo "Checking for vbetool..."
     if ! rpm -q vbetool >/dev/null 2>&1; then
-        echo "Adding home:plater repository for vbetool..."
-        if ! zypper lr | grep -q "home_plater"; then
-            zypper addrepo -f -n "home:plater" https://download.opensuse.org/repositories/home:/plater/openSUSE_Leap_15.6/ home_plater || { echo "Error: Failed to add home:plater repository"; exit 1; }
+        echo "Adding home:tiwai repository for vbetool..."
+        if ! zypper lr | grep -q "home_tiwai"; then
+            zypper addrepo -f -n "home:tiwai" https://download.opensuse.org/repositories/home:tiwai/15.6/ home_tiwai || { echo "Error: Failed to add home:tiwai repository"; exit 1; }
             zypper refresh || { echo "Error: Failed to refresh repositories"; exit 1; }
         else
-            echo "home:plater repository already exists"
+            echo "home:tiwai repository already exists"
         fi
         echo "Installing vbetool..."
         zypper --non-interactive install vbetool || { echo "Error: vbetool not found in repositories, required for TTY display control"; exit 1; }
