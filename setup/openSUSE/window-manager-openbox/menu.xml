@@ -1,42 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<openbox_menu xmlns="http://openbox.org/3.4/menu">
-
-<menu id="apps-menu" label="Applications" execute="openbox-pipemenu" />
-<menu id="ob-menu" label="Openbox Preferences">
-  <item label="Openbox Configuration Manager">
-    <action name="Execute">
-      <command>obconf</command>
-      <startupnotify><enabled>yes</enabled></startupnotify>
-    </action>
-  </item>
-  <item label="Reconfigure Openbox">
-    <action name="Reconfigure" />
-  </item>
-</menu>
-
-  <menu id="root-menu" label="Openbox 3">
-    <item label="Terminal">
-      <action name="Execute"><command>xterm</command></action>
+<openbox_menu xmlns="http://openbox.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://openbox.org/ file:///usr/share/openbox/menu.xsd">
+  <menu id="root-menu" label="Openbox">
+    <item label="Openbox Configuration">
+      <action name="Execute"><command>obconf</command></action>
     </item>
-    <item label="Volume Control">
-      <action name="Execute"><command>pavucontrol</command></action>
+    <separator />
+    <menu id="apps-menu" label="Applications">
+      <item label="Terminal">
+        <action name="Execute"><command>xterm</command></action>
+      </item>
+      <item label="PulseAudio Volume Control">
+        <action name="Execute"><command>pavucontrol</command></action>
+      </item>
+      <item label="Brave Browser">
+        <action name="Execute"><command>brave-browser</command></action>
+      </item>
+      <item label="Jellyfin MPV Shim">
+        <action name="Execute"><command>jellyfin-mpv-shim</command></action>
+      </item>
+    </menu>
+    <menu id="pipe-menu" label="Running Applications" execute="/usr/local/bin/running-apps-pipe-menu.sh" />
+    <separator />
+    <item label="Exit">
+      <action name="Exit">
+        <prompt>yes</prompt>
+      </action>
     </item>
-    <item label="Brave Browser">
-      <action name="Execute"><command>brave-browser</command></action>
-    </item>
-      <separator label="Openbox 3" />
-  <menu id="apps-menu" />
-  <separator />
-  <menu id="ob-menu" />
-  <separator />
-  <item label="Log Out">
-    <action name="Exit">
-      <prompt>yes</prompt>
-    </action>
-  </item>
-    <separator/>
-    <menu id="running-apps" label="Running Applications" execute="/usr/local/bin/running-apps-pipe-menu.sh" />
   </menu>
-
 </openbox_menu>

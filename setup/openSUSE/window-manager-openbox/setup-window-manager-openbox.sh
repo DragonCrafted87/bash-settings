@@ -21,7 +21,7 @@ set_boot_to_tty() {
 # Function to install necessary packages
 install_packages() {
     echo "Checking Openbox and dependencies..."
-    PACKAGES="openbox obconf wmctrl feh xterm pavucontrol curl"
+    PACKAGES="openbox obconf wmctrl feh xterm pavucontrol curl mpv python3 python3-pip python3-qt5"
     for PKG in $PACKAGES; do
         if ! rpm -q "$PKG" >/dev/null 2>&1; then
             echo "Installing $PKG..."
@@ -30,6 +30,17 @@ install_packages() {
             echo "$PKG is already installed"
         fi
     done
+}
+
+# Function to install jellyfin-mpv-shim via pip
+install_jellyfin_mpv_shim() {
+    echo "Checking jellyfin-mpv-shim..."
+    if ! pip3 show jellyfin-mpv-shim >/dev/null 2>&1; then
+        echo "Installing jellyfin-mpv-shim via pip..."
+        sudo pip3 install --upgrade jellyfin-mpv-shim
+    else
+        echo "jellyfin-mpv-shim is already installed"
+    fi
 }
 
 # Function to configure .xinitrc to start Openbox
@@ -45,7 +56,7 @@ configure_xinitrc() {
 # Function to set up Openbox configuration files
 setup_openbox_config() {
     mkdir -p ~/.config/openbox
-    for FILE in menu.xml rc.xml; do
+    for FILE in menu.xml rc.xml autostart; do
         SRC="$SCRIPT_DIR/$FILE"
         DEST=~/.config/openbox/$FILE
         if [ -f "$SRC" ]; then
@@ -139,6 +150,7 @@ place_pipe_menu_script() {
 main() {
     set_boot_to_tty
     install_packages
+    install_jellyfin_mpv_shim
     configure_xinitrc
     setup_openbox_config
     install_multimedia_codecs
