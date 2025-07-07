@@ -171,30 +171,37 @@ else
     echo "htop is already installed"
 fi
 
+# Debug flag states before running scripts
+echo "DEBUG: Flag states: WITH_BOINC=$WITH_BOINC, WITH_DISPLAY_IDLE=$WITH_DISPLAY_IDLE, WITH_LID_CONTROL=$WITH_LID_CONTROL, WITH_SWAY=$WITH_SWAY, WITH_OPENBOX=$WITH_OPENBOX"
+
 # Run subcontrol scripts based on flags
 echo "Running network-wait setup..."
-bash "$SYSTEMD_SCRIPT"
+bash "$SYSTEMD_SCRIPT" || { echo "Error: Failed to run $SYSTEMD_SCRIPT"; exit 1; }
 
 if [ "$WITH_BOINC" = true ]; then
+    echo "DEBUG: Executing BOINC setup with $BOINC_SCRIPT"
     echo "Running BOINC setup..."
-    bash "$BOINC_SCRIPT"
+    bash "$BOINC_SCRIPT" || { echo "Error: Failed to run $BOINC_SCRIPT"; exit 1; }
 fi
 
 if [ "$WITH_DISPLAY_IDLE" = true ] || [ "$WITH_LID_CONTROL" = true ]; then
+    echo "DEBUG: Executing display setup with $DISPLAY_SCRIPT $([ "$WITH_DISPLAY_IDLE" = true ] && echo "--with-display-idle") $([ "$WITH_LID_CONTROL" = true ] && echo "--with-lid-control")"
     echo "Running display setup..."
     bash "$DISPLAY_SCRIPT" \
         $([ "$WITH_DISPLAY_IDLE" = true ] && echo "--with-display-idle") \
-        $([ "$WITH_LID_CONTROL" = true ] && echo "--with-lid-control")
+        $([ "$WITH_LID_CONTROL" = true ] && echo "--with-lid-control") || { echo "Error: Failed to run $DISPLAY_SCRIPT"; exit 1; }
 fi
 
 if [ "$WITH_SWAY" = true ]; then
+    echo "DEBUG: Executing Sway setup with $SWAY_SCRIPT"
     echo "Running Sway window manager setup..."
-    bash "$SWAY_SCRIPT"
+    bash "$SWAY_SCRIPT" || { echo "Error: Failed to run $SWAY_SCRIPT"; exit 1; }
 fi
 
 if [ "$WITH_OPENBOX" = true ]; then
+    echo "DEBUG: Executing Openbox setup with $OPENBOX_SCRIPT"
     echo "Running Openbox window manager setup..."
-    bash "$OPENBOX_SCRIPT"
+    bash "$OPENBOX_SCRIPT" || { echo "Error: Failed to run $OPENBOX_SCRIPT"; exit 1; }
 fi
 
 echo "Setup complete."
