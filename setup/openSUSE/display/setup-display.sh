@@ -65,14 +65,21 @@ if [ "$WITH_DISPLAY_IDLE" = true ]; then
     echo "Checking for inotify-tools..."
     if ! rpm -q inotify-tools >/dev/null 2>&1; then
         echo "Installing inotify-tools..."
-        zypper --non-interactive install inotify-tools
+        zypper --non-interactive install inotify-tools || { echo "Error: Failed to install inotify-tools"; exit 1; }
     else
         echo "inotify-tools is already installed"
     fi
     echo "Checking for vbetool..."
     if ! rpm -q vbetool >/dev/null 2>&1; then
+        echo "Adding home:plater repository for vbetool..."
+        if ! zypper lr | grep -q "home_plater"; then
+            zypper addrepo -f -n "home:plater" https://download.opensuse.org/repositories/home:/plater/openSUSE_Leap_15.6/ home_plater || { echo "Error: Failed to add home:plater repository"; exit 1; }
+            zypper refresh || { echo "Error: Failed to refresh repositories"; exit 1; }
+        else
+            echo "home:plater repository already exists"
+        fi
         echo "Installing vbetool..."
-        zypper --non-interactive install vbetool
+        zypper --non-interactive install vbetool || { echo "Error: vbetool not found in repositories, required for TTY display control"; exit 1; }
     else
         echo "vbetool is already installed"
     fi
@@ -102,46 +109,46 @@ for SRC in "${!FILE_PAIRS[@]}"; do
         echo "$DEST is already up to date"
     else
         echo "Copying $SRC to $DEST..."
-        cp "$SRC" "$DEST"
+        cp "$SRC" "$DEST" || { echo "Error: Failed to copy $SRC to $DEST"; exit 1; }
     fi
 done
 
 # Set permissions for scripts
 if [ "$WITH_DISPLAY_IDLE" = true ]; then
     echo "Ensuring executable permissions for $DISPLAY_SCRIPT_DEST..."
-    chmod +x "$DISPLAY_SCRIPT_DEST"
+    chmod +x "$DISPLAY_SCRIPT_DEST" || { echo "Error: Failed to set permissions for $DISPLAY_SCRIPT_DEST"; exit 1; }
 fi
 if [ "$WITH_LID_CONTROL" = true ]; then
     echo "Ensuring executable permissions for $DISPLAY_LID_SCRIPT_DEST..."
-    chmod +x "$DISPLAY_LID_SCRIPT_DEST"
+    chmod +x "$DISPLAY_LID_SCRIPT_DEST" || { echo "Error: Failed to set permissions for $DISPLAY_LID_SCRIPT_DEST"; exit 1; }
 fi
 
 # Run disable-lid-sleep.sh if WITH_LID_CONTROL is true
 if [ "$WITH_LID_CONTROL" = true ]; then
     echo "Running disable-lid-sleep.sh to disable sleep on lid close..."
-    bash "$DISPLAY_LID_SCRIPT_DEST"
+    bash "$DISPLAY_LID_SCRIPT_DEST" || { echo "Error: Failed to run $DISPLAY_LID_SCRIPT_DEST"; exit 1; }
 fi
 
 # Enable and start display-idle service if WITH_DISPLAY_IDLE is true
 if [ "$WITH_DISPLAY_IDLE" = true ]; then
     echo "Reloading systemd daemon..."
-    systemctl daemon-reload
+    systemctl daemon-reload || { echo "Error: Failed to reload systemd daemon"; exit 1; }
     echo "Checking display-idle.service..."
     if ! systemctl is-enabled --quiet display-idle.service; then
         echo "Enabling display-idle.service..."
-        systemctl enable display-idle.service
+        systemctl enable display-idle.service || { echo "Error: Failed to enable display-idle.service"; exit 1; }
     else
         echo "display-idle.service is already enabled"
     fi
     if ! systemctl is-active --quiet display-idle.service; then
         echo "Starting display-idle.service..."
-        systemctl start display-idle.service
+        systemctl start display-idle.service || { echo "Error: Failed to start display-idle.service"; exit 1; }
     else
         echo "display-idle.service is already running"
     fi
     # Verify service status
     echo "Checking display-idle.service status..."
-    systemctl status display-idle.service --no-pager
+    systemctl status display-idle.service --no-pager || echo "Note: display-idle.service status check returned non-zero, but continuing"
 fi
 
 echo "Display setup complete."
