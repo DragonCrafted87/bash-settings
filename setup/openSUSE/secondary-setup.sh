@@ -1,13 +1,16 @@
 #!/bin/bash
-# Script to deploy network-wait service, install htop, and optionally deploy boinc scripts and configure BOINC RPC on openSUSE Leap 15.6
-# Idempotent: checks for existing files, packages, and service states
-# Run with sudo from setup/openSUSE/ directory or specify repository path
-# Use --with-boinc to include BOINC setup, otherwise BOINC steps are skipped
+# Main script to coordinate setup of network-wait, BOINC, display idle, and lid control on openSUSE Leap 15.6
+# Idempotent: delegates to subcontrol scripts in subdirectories
+# Run with sudo from setup/openSUSE/ directory
+# Use --with-boinc, --with-display-idle, --with-lid-control, or --interactive for menu-driven setup
 
 set -e
 
-# Default: skip BOINC setup unless --with-boinc is provided
+# Defaults: skip optional components unless specified
 WITH_BOINC=false
+WITH_DISPLAY_IDLE=false
+WITH_LID_CONTROL=false
+INTERACTIVE=false
 
 # Parse command-line arguments
 while [ $# -gt 0 ]; do
@@ -16,9 +19,21 @@ while [ $# -gt 0 ]; do
             WITH_BOINC=true
             shift
             ;;
+        --with-display-idle)
+            WITH_DISPLAY_IDLE=true
+            shift
+            ;;
+        --with-lid-control)
+            WITH_LID_CONTROL=true
+            shift
+            ;;
+        --interactive)
+            INTERACTIVE=true
+            shift
+            ;;
         *)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--with-boinc]"
+            echo "Usage: $0 [--with-boinc] [--with-display-idle] [--with-lid-control] [--interactive]"
             exit 1
             ;;
     esac
@@ -26,36 +41,83 @@ done
 
 # Define paths
 REPO_DIR="$(dirname "$(realpath "$0")")"
-SERVICE_SRC="${REPO_DIR}/systemd/network-wait.service"
-SCRIPT_SRC="${REPO_DIR}/systemd/wait-for-network.sh"
-SERVICE_DEST="/etc/systemd/system/network-wait.service"
-SCRIPT_DEST="/usr/local/bin/wait-for-network.sh"
+SYSTEMD_SCRIPT="${REPO_DIR}/systemd/setup-systemd.sh"
+BOINC_SCRIPT="${REPO_DIR}/boinc/setup-boinc.sh"
+DISPLAY_SCRIPT="${REPO_DIR}/display/setup-display.sh"
 
-# BOINC paths (only used if WITH_BOINC is true)
-BOINC_CONFIG_SRC="${REPO_DIR}/boinc/boinc-config.sh"
-BOINC_STATUS_SRC="${REPO_DIR}/boinc/boinc-status.sh"
-BOINC_CONFIG_DEST="/usr/local/bin/boinc-config.sh"
-BOINC_STATUS_DEST="/usr/local/bin/boinc-status.sh"
-BOINC_DIR="/var/lib/boinc"
-RPC_AUTH_FILE="${BOINC_DIR}/gui_rpc_auth.cfg"
-
-# Check if source files exist (always check network-wait files, conditionally check BOINC files)
-for SRC in "$SERVICE_SRC" "$SCRIPT_SRC"; do
-    if [ ! -f "$SRC" ]; then
-        echo "Error: $SRC not found"
+# Check if subcontrol scripts exist
+for SCRIPT in "$SYSTEMD_SCRIPT"; do
+    if [ ! -f "$SCRIPT" ]; then
+        echo "Error: $SCRIPT not found"
         exit 1
     fi
 done
-if [ "$WITH_BOINC" = true ]; then
-    for SRC in "$BOINC_CONFIG_SRC" "$BOINC_STATUS_SRC"; do
-        if [ ! -f "$SRC" ]; then
-            echo "Error: $SRC not found"
-            exit 1
-        fi
+if [ "$WITH_BOINC" = true ] || [ "$INTERACTIVE" = true ]; then
+    if [ ! -f "$BOINC_SCRIPT" ]; then
+        echo "Error: $BOINC_SCRIPT not found"
+        exit 1
+    fi
+fi
+if [ "$WITH_DISPLAY_IDLE" = true ] || [ "$WITH_LID_CONTROL" = true ] || [ "$INTERACTIVE" = true ]; then
+    if [ ! -f "$DISPLAY_SCRIPT" ]; then
+        echo "Error: $DISPLAY_SCRIPT not found"
+        exit 1
+    fi
+fi
+
+# Interactive menu using dialog
+if [ "$INTERACTIVE" = true ]; then
+    # Check and install dialog if not present
+    echo "Checking for dialog..."
+    if ! rpm -q dialog >/dev/null 2>&1; then
+        echo "Installing dialog..."
+        zypper --non-interactive install dialog
+    else
+        echo "dialog is already installed"
+    fi
+
+    # Reset flags to false to avoid conflicts with command-line flags
+    WITH_BOINC=false
+    WITH_DISPLAY_IDLE=false
+    WITH_LID_CONTROL=false
+
+    # Create temporary file for dialog output
+    TEMP_FILE=$(mktemp)
+
+    # Display menu
+    dialog --checklist "Select components to install (network-wait is always installed):" 15 60 4 \
+        "boinc" "BOINC client and scripts" off \
+        "display-idle" "Display idle monitor service" off \
+        "lid-control" "Disable sleep on lid close" off 2> "$TEMP_FILE"
+
+    # Check if user cancelled
+    if [ $? -ne 0 ]; then
+        echo "Interactive setup cancelled."
+        rm -f "$TEMP_FILE"
+        exit 0
+    fi
+
+    # Read selections
+    SELECTIONS=$(cat "$TEMP_FILE" | tr -d '"')
+    rm -f "$TEMP_FILE"
+
+    # Set flags based on selections
+    for SELECTION in $SELECTIONS; do
+        case "$SELECTION" in
+            boinc)
+                WITH_BOINC=true
+                ;;
+            display-idle)
+                WITH_DISPLAY_IDLE=true
+                ;;
+            lid-control)
+                WITH_LID_CONTROL=true
+                ;;
+        esac
     done
 fi
 
-# Check and install htop (and boinc-client if WITH_BOINC is true)
+# Check and install htop (common dependency)
 echo "Checking for htop..."
 if ! rpm -q htop >/dev/null 2>&1; then
     echo "Installing htop..."
@@ -64,99 +126,31 @@ else
     echo "htop is already installed"
 fi
 
+# Run subcontrol scripts based on flags
+echo "Running network-wait setup..."
+bash "$SYSTEMD_SCRIPT"
+
 if [ "$WITH_BOINC" = true ]; then
-    echo "Checking for boinc-client..."
-    if ! rpm -q boinc-client >/dev/null 2>&1; then
-        echo "Installing boinc-client..."
-        zypper --non-interactive install boinc-client
-    else
-        echo "boinc-client is already installed"
-    fi
+    echo "Running BOINC setup..."
+    bash "$BOINC_SCRIPT"
 fi
 
-# Configure BOINC RPC authentication (only if WITH_BOINC is true)
-if [ "$WITH_BOINC" = true ]; then
-    echo "Checking BOINC RPC configuration..."
-    if [ ! -f "$RPC_AUTH_FILE" ]; then
-        echo "Creating $RPC_AUTH_FILE with random password..."
-        # Generate a random 32-character password
-        RPC_PASSWORD=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c32)
-        echo "$RPC_PASSWORD" > "$RPC_AUTH_FILE"
-        chown boinc:boinc "$RPC_AUTH_FILE"
-        chmod 640 "$RPC_AUTH_FILE"
-        echo "RPC password generated and configured"
-    else
-        echo "$RPC_AUTH_FILE already exists"
-    fi
-fi
-
-# Check and deploy files
-echo "Checking and deploying files..."
-declare -A FILE_PAIRS=(
-    ["$SERVICE_SRC"]="$SERVICE_DEST"
-    ["$SCRIPT_SRC"]="$SCRIPT_DEST"
-)
-if [ "$WITH_BOINC" = true ]; then
-    FILE_PAIRS["$BOINC_CONFIG_SRC"]="$BOINC_CONFIG_DEST"
-    FILE_PAIRS["$BOINC_STATUS_SRC"]="$BOINC_STATUS_DEST"
-fi
-for SRC in "${!FILE_PAIRS[@]}"; do
-    DEST="${FILE_PAIRS[$SRC]}"
-    if [ -f "$DEST" ] && cmp -s "$SRC" "$DEST"; then
-        echo "$DEST is already up to date"
-    else
-        echo "Copying $SRC to $DEST..."
-        cp "$SRC" "$DEST"
-    fi
-done
-
-# Set permissions for scripts
-echo "Ensuring executable permissions for $SCRIPT_DEST..."
-chmod +x "$SCRIPT_DEST"
-if [ "$WITH_BOINC" = true ]; then
-    echo "Ensuring executable permissions for $BOINC_CONFIG_DEST and $BOINC_STATUS_DEST..."
-    chmod +x "$BOINC_CONFIG_DEST" "$BOINC_STATUS_DEST"
-fi
-
-# Enable and start boinc-client service if WITH_BOINC is true and not already enabled/started
-if [ "$WITH_BOINC" = true ]; then
-    echo "Checking boinc-client service..."
-    if ! systemctl is-enabled --quiet boinc-client; then
-        echo "Enabling boinc-client service..."
-        systemctl enable boinc-client
-    else
-        echo "boinc-client service is already enabled"
-    fi
-    if ! systemctl is-active --quiet boinc-client; then
-        echo "Starting boinc-client service..."
-        systemctl start boinc-client
-    else
-        echo "boinc-client service is already running"
-    fi
-fi
-
-# Reload systemd and enable network-wait service
-echo "Reloading systemd daemon..."
-systemctl daemon-reload
-echo "Checking network-wait.service..."
-if ! systemctl is-enabled --quiet network-wait.service; then
-    echo "Enabling network-wait.service..."
-    systemctl enable network-wait.service
-else
-    echo "network-wait.service is already enabled"
-fi
-
-# Verify service statuses
-echo "Checking network-wait.service status..."
-systemctl status network-wait.service --no-pager
-if [ "$WITH_BOINC" = true ]; then
-    echo "Checking boinc-client service status..."
-    systemctl status boinc-client --no-pager
+if [ "$WITH_DISPLAY_IDLE" = true ] || [ "$WITH_LID_CONTROL" = true ]; then
+    echo "Running display setup..."
+    bash "$DISPLAY_SCRIPT" \
+        $([ "$WITH_DISPLAY_IDLE" = true ] && echo "--with-display-idle") \
+        $([ "$WITH_LID_CONTROL" = true ] && echo "--with-lid-control")
 fi
 
 echo "Setup complete."
 if [ "$WITH_BOINC" = true ]; then
     echo "Run 'sudo /usr/local/bin/boinc-config.sh' to configure BOINC for Science United."
     echo "Run 'sudo /usr/local/bin/boinc-status.sh' to check BOINC status."
+fi
+if [ "$WITH_DISPLAY_IDLE" = true ]; then
+    echo "Display idle settings applied. Monitor logs with: journalctl -u display-idle.service -n 100 -f"
+fi
+if [ "$WITH_LID_CONTROL" = true ]; then
+    echo "Lid sleep control applied. Monitor logs with: journalctl -u systemd-logind -n 100 -f"
 fi
 exit 0
