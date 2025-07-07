@@ -54,8 +54,8 @@ REPO_DIR="$(dirname "$(realpath "$0")")"
 SYSTEMD_SCRIPT="${REPO_DIR}/systemd/setup-systemd.sh"
 BOINC_SCRIPT="${REPO_DIR}/boinc/setup-boinc.sh"
 DISPLAY_SCRIPT="${REPO_DIR}/display/setup-display.sh"
-SWAY_SCRIPT="${REPO_DIR}/window-manager-sway/window-manager-sway.sh"
-OPENBOX_SCRIPT="${REPO_DIR}/window-manager-openbox/window-manager-openbox.sh"
+SWAY_SCRIPT="${REPO_DIR}/window-manager-sway/setup-window-manager-sway.sh"
+OPENBOX_SCRIPT="${REPO_DIR}/window-manager-openbox/setup-window-manager-openbox.sh"
 
 # Check if subcontrol scripts exist
 for SCRIPT in "$SYSTEMD_SCRIPT"; do
