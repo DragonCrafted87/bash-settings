@@ -58,11 +58,5 @@ else
 fi
 echo "DEBUG: Checked/enabled network-wait.service"
 
-# Verify service status (use --no-pager and redirect output to avoid exit code issues)
-echo "Checking network-wait.service status..."
-systemctl status network-wait.service --no-pager > /dev/null || echo "Note: network-wait.service status check returned non-zero, but continuing"
-systemctl status network-wait.service --no-pager
-echo "DEBUG: Checked network-wait.service status"
-
 echo "Network-wait setup complete."
 exit 0
