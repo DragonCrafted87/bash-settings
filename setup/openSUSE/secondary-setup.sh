@@ -54,8 +54,8 @@ REPO_DIR="$(dirname "$(realpath "$0")")"
 SYSTEMD_SCRIPT="${REPO_DIR}/systemd/setup-systemd.sh"
 BOINC_SCRIPT="${REPO_DIR}/boinc/setup-boinc.sh"
 DISPLAY_SCRIPT="${REPO_DIR}/display/setup-display.sh"
-SWAY_SCRIPT="${REPO_DIR}/window-manager-sway/setup-window-manager-sway.sh"
-OPENBOX_SCRIPT="${REPO_DIR}/window-manager-openbox/setup-window-manager-openbox.sh"
+SWAY_SCRIPT="${REPO_DIR}/window-manager-sway/window-manager-sway.sh"
+OPENBOX_SCRIPT="${REPO_DIR}/window-manager-openbox/window-manager-openbox.sh"
 
 # Check if subcontrol scripts exist
 for SCRIPT in "$SYSTEMD_SCRIPT"; do
@@ -125,30 +125,41 @@ if [ "$INTERACTIVE" = true ]; then
         exit 0
     fi
 
-    # Read selections
-    SELECTIONS=$(cat "$TEMP_FILE" | tr -d '"')
+    # Read and debug selections
+    RAW_OUTPUT=$(cat "$TEMP_FILE")
+    echo "DEBUG: Raw dialog output: '$RAW_OUTPUT'"
+    SELECTIONS=$(echo "$RAW_OUTPUT" | tr -s ' ' | tr ' ' '\n' | sed '/^$/d')
+    echo "DEBUG: Processed selections: '$SELECTIONS'"
     rm -f "$TEMP_FILE"
 
     # Set flags based on selections
-    for SELECTION in $SELECTIONS; do
+    while IFS= read -r SELECTION; do
         case "$SELECTION" in
             boinc)
                 WITH_BOINC=true
+                echo "DEBUG: Set WITH_BOINC=true"
                 ;;
             display-idle)
                 WITH_DISPLAY_IDLE=true
+                echo "DEBUG: Set WITH_DISPLAY_IDLE=true"
                 ;;
             lid-control)
                 WITH_LID_CONTROL=true
+                echo "DEBUG: Set WITH_LID_CONTROL=true"
                 ;;
             sway)
                 WITH_SWAY=true
+                echo "DEBUG: Set WITH_SWAY=true"
                 ;;
             openbox)
                 WITH_OPENBOX=true
+                echo "DEBUG: Set WITH_OPENBOX=true"
+                ;;
+            *)
+                echo "DEBUG: Unknown selection: '$SELECTION'"
                 ;;
         esac
-    done
+    done <<< "$SELECTIONS"
 fi
 
 # Check and install htop (common dependency)
