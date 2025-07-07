@@ -18,6 +18,7 @@ for SRC in "$SERVICE_SRC" "$SCRIPT_SRC"; do
         echo "Error: $SRC not found"
         exit 1
     fi
+    echo "DEBUG: Found $SRC"
 done
 
 # Check and deploy files
@@ -32,28 +33,36 @@ for SRC in "${!FILE_PAIRS[@]}"; do
         echo "$DEST is already up to date"
     else
         echo "Copying $SRC to $DEST..."
-        cp "$SRC" "$DEST"
+        cp "$SRC" "$DEST" || { echo "Error: Failed to copy $SRC to $DEST"; exit 1; }
     fi
+    echo "DEBUG: Processed $SRC to $DEST"
 done
 
 # Set permissions for script
 echo "Ensuring executable permissions for $SCRIPT_DEST..."
-chmod +x "$SCRIPT_DEST"
+chmod +x "$SCRIPT_DEST" || { echo "Error: Failed to set permissions for $SCRIPT_DEST"; exit 1; }
+echo "DEBUG: Set permissions for $SCRIPT_DEST"
 
-# Reload systemd and enable network-wait service
+# Reload systemd
 echo "Reloading systemd daemon..."
-systemctl daemon-reload
+systemctl daemon-reload || { echo "Error: Failed to reload systemd daemon"; exit 1; }
+echo "DEBUG: Reloaded systemd daemon"
+
+# Enable network-wait service
 echo "Checking network-wait.service..."
 if ! systemctl is-enabled --quiet network-wait.service; then
     echo "Enabling network-wait.service..."
-    systemctl enable network-wait.service
+    systemctl enable network-wait.service || { echo "Error: Failed to enable network-wait.service"; exit 1; }
 else
     echo "network-wait.service is already enabled"
 fi
+echo "DEBUG: Checked/enabled network-wait.service"
 
-# Verify service status
+# Verify service status (use --no-pager and redirect output to avoid exit code issues)
 echo "Checking network-wait.service status..."
+systemctl status network-wait.service --no-pager > /dev/null || echo "Note: network-wait.service status check returned non-zero, but continuing"
 systemctl status network-wait.service --no-pager
+echo "DEBUG: Checked network-wait.service status"
 
 echo "Network-wait setup complete."
 exit 0
