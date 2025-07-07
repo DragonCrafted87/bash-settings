@@ -2,8 +2,16 @@
 # Subcontrol script to set up Openbox window manager on openSUSE Leap 15.6
 # Idempotent: checks for existing packages, configurations, and repositories
 # Run with sudo from setup/openSUSE/window-manager-openbox/ directory or via main script
+# Configures user-specific files in the invoking user's home directory
 
 set -e
+
+# Determine the invoking user's home directory
+if [ -n "$SUDO_USER" ]; then
+    USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+else
+    USER_HOME="$HOME"
+fi
 
 # Determine the directory of the script
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
@@ -21,7 +29,7 @@ set_boot_to_tty() {
 # Function to install necessary packages
 install_packages() {
     echo "Checking Openbox and dependencies..."
-    PACKAGES="openbox obconf wmctrl feh xterm pavucontrol curl mpv python3 python3-pip python3-qt5"
+    PACKAGES="openbox obconf wmctrl feh xterm pavucontrol curl"
     for PKG in $PACKAGES; do
         if ! rpm -q "$PKG" >/dev/null 2>&1; then
             echo "Installing $PKG..."
@@ -32,22 +40,11 @@ install_packages() {
     done
 }
 
-# Function to install jellyfin-mpv-shim via pip
-install_jellyfin_mpv_shim() {
-    echo "Checking jellyfin-mpv-shim..."
-    if ! pip3 show jellyfin-mpv-shim >/dev/null 2>&1; then
-        echo "Installing jellyfin-mpv-shim via pip..."
-        sudo pip3 install --upgrade jellyfin-mpv-shim
-    else
-        echo "jellyfin-mpv-shim is already installed"
-    fi
-}
-
 # Function to configure .xinitrc to start Openbox
 configure_xinitrc() {
-    if [ ! -f ~/.xinitrc ] || ! grep -q "exec openbox-session" ~/.xinitrc; then
-        echo "Configuring .xinitrc to start Openbox..."
-        echo "exec openbox-session" > ~/.xinitrc
+    if [ ! -f "$USER_HOME/.xinitrc" ] || ! grep -q "exec openbox-session" "$USER_HOME/.xinitrc"; then
+        echo "Configuring .xinitrc to start Openbox for user $SUDO_USER..."
+        sudo -u "$SUDO_USER" sh -c "echo 'exec openbox-session' > '$USER_HOME/.xinitrc'"
     else
         echo ".xinitrc already configured for Openbox"
     fi
@@ -55,16 +52,16 @@ configure_xinitrc() {
 
 # Function to set up Openbox configuration files
 setup_openbox_config() {
-    mkdir -p ~/.config/openbox
-    for FILE in menu.xml rc.xml autostart; do
+    sudo -u "$SUDO_USER" mkdir -p "$USER_HOME/.config/openbox"
+    for FILE in menu.xml rc.xml; do
         SRC="$SCRIPT_DIR/$FILE"
-        DEST=~/.config/openbox/$FILE
+        DEST="$USER_HOME/.config/openbox/$FILE"
         if [ -f "$SRC" ]; then
             if [ -f "$DEST" ] && cmp -s "$SRC" "$DEST"; then
                 echo "$DEST is already up to date"
             else
                 echo "Copying $SRC to $DEST..."
-                cp "$SRC" "$DEST"
+                sudo -u "$SUDO_USER" cp "$SRC" "$DEST"
             fi
         else
             echo "Warning: $SRC not found"
@@ -150,7 +147,6 @@ place_pipe_menu_script() {
 main() {
     set_boot_to_tty
     install_packages
-    install_jellyfin_mpv_shim
     configure_xinitrc
     setup_openbox_config
     install_multimedia_codecs

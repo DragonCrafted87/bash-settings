@@ -2,8 +2,16 @@
 # Subcontrol script to set up Sway window manager on openSUSE Leap 15.6
 # Idempotent: checks for existing packages and configurations
 # Run with sudo from setup/openSUSE/window-manager-sway/ directory or via main script
+# Configures user-specific files in the invoking user's home directory
 
 set -e
+
+# Determine the invoking user's home directory
+if [ -n "$SUDO_USER" ]; then
+    USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+else
+    USER_HOME="$HOME"
+fi
 
 # Determine the directory of this script
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
@@ -45,9 +53,9 @@ done
 
 # Install jellyfin-mpv-shim
 echo "Checking jellyfin-mpv-shim..."
-if ! pip3 show jellyfin-mpv-shim >/dev/null 2>&1; then
+if ! sudo -u "$SUDO_USER" pip3 show jellyfin-mpv-shim >/dev/null 2>&1; then
     echo "Installing jellyfin-mpv-shim..."
-    sudo pip3 install --upgrade jellyfin-mpv-shim
+    sudo -u "$SUDO_USER" pip3 install --upgrade jellyfin-mpv-shim
 else
     echo "jellyfin-mpv-shim is already installed"
 fi
@@ -55,34 +63,34 @@ fi
 # Enable PipeWire user services for audio
 echo "Checking PipeWire services..."
 for SERVICE in pipewire.service pipewire-pulse.service; do
-    if ! systemctl --user is-enabled --quiet "$SERVICE"; then
-        echo "Enabling $SERVICE..."
-        systemctl --user enable "$SERVICE"
+    if ! sudo -u "$SUDO_USER" systemctl --user is-enabled --quiet "$SERVICE"; then
+        echo "Enabling $SERVICE for user $SUDO_USER..."
+        sudo -u "$SUDO_USER" systemctl --user enable "$SERVICE"
     else
-        echo "$SERVICE is already enabled"
+        echo "$SERVICE is already enabled for user $SUDO_USER"
     fi
-    if ! systemctl --user is-active --quiet "$SERVICE"; then
-        echo "Starting $SERVICE..."
-        systemctl --user start "$SERVICE"
+    if ! sudo -u "$SUDO_USER" systemctl --user is-active --quiet "$SERVICE"; then
+        echo "Starting $SERVICE for user $SUDO_USER..."
+        sudo -u "$SUDO_USER" systemctl --user start "$SERVICE"
     else
-        echo "$SERVICE is already running"
+        echo "$SERVICE is already running for user $SUDO_USER"
     fi
 done
 
 # Set up Sway configuration
-echo "Setting up Sway configuration..."
-mkdir -p ~/.config/sway
-if [ ! -f ~/.config/sway/config ]; then
+echo "Setting up Sway configuration for user $SUDO_USER..."
+sudo -u "$SUDO_USER" mkdir -p "$USER_HOME/.config/sway"
+if [ ! -f "$USER_HOME/.config/sway/config" ]; then
     echo "Copying default Sway configuration..."
-    cp /etc/sway/config ~/.config/sway/config
+    sudo -u "$SUDO_USER" cp /etc/sway/config "$USER_HOME/.config/sway/config"
 else
     echo "Sway configuration already exists"
 fi
 
 # Add autostart for jellyfin-mpv-shim
-if ! grep -q "exec jellyfin-mpv-shim" ~/.config/sway/config; then
+if ! grep -q "exec jellyfin-mpv-shim" "$USER_HOME/.config/sway/config"; then
     echo "Adding jellyfin-mpv-shim to Sway autostart..."
-    echo "exec jellyfin-mpv-shim" >> ~/.config/sway/config
+    sudo -u "$SUDO_USER" sh -c "echo 'exec jellyfin-mpv-shim' >> '$USER_HOME/.config/sway/config'"
 else
     echo "jellyfin-mpv-shim already in Sway autostart"
 fi
@@ -98,16 +106,16 @@ fi
 # Run auxiliary script
 if [ -f "$SCRIPT_DIR/update-keybinding.sh" ]; then
     echo "Running update-keybinding.sh..."
-    "$SCRIPT_DIR/update-keybinding.sh"
+    sudo -u "$SUDO_USER" "$SCRIPT_DIR/update-keybinding.sh"
 else
     echo "Skipping update-keybinding.sh (not found)"
 fi
 
 # Check if Sway is running and restart it if necessary
-echo "Checking Sway status..."
-if swaymsg -t get_version >/dev/null 2>&1; then
+echo "Checking Sway status for user $SUDO_USER..."
+if sudo -u "$SUDO_USER" swaymsg -t get_version >/dev/null 2>&1; then
     echo "Restarting Sway by exiting current session..."
-    swaymsg exit  # This exits Sway, allowing the user to log back in
+    sudo -u "$SUDO_USER" swaymsg exit  # This exits Sway, allowing the user to log back in
 else
     echo "Sway is not running."
 fi
