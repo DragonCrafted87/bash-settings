@@ -1,8 +1,8 @@
 #!/bin/bash
-# Main script to coordinate setup of network-wait, BOINC, display idle, and lid control on openSUSE Leap 15.6
+# Main script to coordinate setup of network-wait, BOINC, display idle, lid control, Sway, and Openbox on openSUSE Leap 15.6
 # Idempotent: delegates to subcontrol scripts in subdirectories
 # Run with sudo from setup/openSUSE/ directory
-# Use --with-boinc, --with-display-idle, --with-lid-control, or --interactive for menu-driven setup
+# Use --with-boinc, --with-display-idle, --with-lid-control, --with-sway, --with-openbox, or --interactive for menu-driven setup
 
 set -e
 
@@ -10,6 +10,8 @@ set -e
 WITH_BOINC=false
 WITH_DISPLAY_IDLE=false
 WITH_LID_CONTROL=false
+WITH_SWAY=false
+WITH_OPENBOX=false
 INTERACTIVE=false
 
 # Parse command-line arguments
@@ -27,13 +29,21 @@ while [ $# -gt 0 ]; do
             WITH_LID_CONTROL=true
             shift
             ;;
+        --with-sway)
+            WITH_SWAY=true
+            shift
+            ;;
+        --with-openbox)
+            WITH_OPENBOX=true
+            shift
+            ;;
         --interactive)
             INTERACTIVE=true
             shift
             ;;
         *)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--with-boinc] [--with-display-idle] [--with-lid-control] [--interactive]"
+            echo "Usage: $0 [--with-boinc] [--with-display-idle] [--with-lid-control] [--with-sway] [--with-openbox] [--interactive]"
             exit 1
             ;;
     esac
@@ -44,6 +54,8 @@ REPO_DIR="$(dirname "$(realpath "$0")")"
 SYSTEMD_SCRIPT="${REPO_DIR}/systemd/setup-systemd.sh"
 BOINC_SCRIPT="${REPO_DIR}/boinc/setup-boinc.sh"
 DISPLAY_SCRIPT="${REPO_DIR}/display/setup-display.sh"
+SWAY_SCRIPT="${REPO_DIR}/window-manager-sway/window-manager-sway.sh"
+OPENBOX_SCRIPT="${REPO_DIR}/window-manager-openbox/window-manager-openbox.sh"
 
 # Check if subcontrol scripts exist
 for SCRIPT in "$SYSTEMD_SCRIPT"; do
@@ -64,6 +76,18 @@ if [ "$WITH_DISPLAY_IDLE" = true ] || [ "$WITH_LID_CONTROL" = true ] || [ "$INTE
         exit 1
     fi
 fi
+if [ "$WITH_SWAY" = true ] || [ "$INTERACTIVE" = true ]; then
+    if [ ! -f "$SWAY_SCRIPT" ]; then
+        echo "Error: $SWAY_SCRIPT not found"
+        exit 1
+    fi
+fi
+if [ "$WITH_OPENBOX" = true ] || [ "$INTERACTIVE" = true ]; then
+    if [ ! -f "$OPENBOX_SCRIPT" ]; then
+        echo "Error: $OPENBOX_SCRIPT not found"
+        exit 1
+    fi
+fi
 
 # Interactive menu using dialog
 if [ "$INTERACTIVE" = true ]; then
@@ -80,15 +104,19 @@ if [ "$INTERACTIVE" = true ]; then
     WITH_BOINC=false
     WITH_DISPLAY_IDLE=false
     WITH_LID_CONTROL=false
+    WITH_SWAY=false
+    WITH_OPENBOX=false
 
     # Create temporary file for dialog output
     TEMP_FILE=$(mktemp)
 
     # Display menu
-    dialog --checklist "Select components to install (network-wait is always installed):" 15 60 4 \
+    dialog --checklist "Select components to install (network-wait is always installed):" 20 60 6 \
         "boinc" "BOINC client and scripts" off \
         "display-idle" "Display idle monitor service" off \
-        "lid-control" "Disable sleep on lid close" off 2> "$TEMP_FILE"
+        "lid-control" "Disable sleep on lid close" off \
+        "sway" "Sway window manager" off \
+        "openbox" "Openbox window manager" off 2> "$TEMP_FILE"
 
     # Check if user cancelled
     if [ $? -ne 0 ]; then
@@ -112,6 +140,12 @@ if [ "$INTERACTIVE" = true ]; then
                 ;;
             lid-control)
                 WITH_LID_CONTROL=true
+                ;;
+            sway)
+                WITH_SWAY=true
+                ;;
+            openbox)
+                WITH_OPENBOX=true
                 ;;
         esac
     done
@@ -142,6 +176,16 @@ if [ "$WITH_DISPLAY_IDLE" = true ] || [ "$WITH_LID_CONTROL" = true ]; then
         $([ "$WITH_LID_CONTROL" = true ] && echo "--with-lid-control")
 fi
 
+if [ "$WITH_SWAY" = true ]; then
+    echo "Running Sway window manager setup..."
+    bash "$SWAY_SCRIPT"
+fi
+
+if [ "$WITH_OPENBOX" = true ]; then
+    echo "Running Openbox window manager setup..."
+    bash "$OPENBOX_SCRIPT"
+fi
+
 echo "Setup complete."
 if [ "$WITH_BOINC" = true ]; then
     echo "Run 'sudo /usr/local/bin/boinc-config.sh' to configure BOINC for Science United."
@@ -152,5 +196,11 @@ if [ "$WITH_DISPLAY_IDLE" = true ]; then
 fi
 if [ "$WITH_LID_CONTROL" = true ]; then
     echo "Lid sleep control applied. Monitor logs with: journalctl -u systemd-logind -n 100 -f"
+fi
+if [ "$WITH_SWAY" = true ]; then
+    echo "Sway window manager setup complete. Start Sway to apply the new configuration."
+fi
+if [ "$WITH_OPENBOX" = true ]; then
+    echo "Openbox window manager setup complete. Run 'startx' from the TTY to start Openbox."
 fi
 exit 0
