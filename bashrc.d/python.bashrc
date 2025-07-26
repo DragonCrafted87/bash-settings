@@ -23,4 +23,10 @@ function python-setup ()
         pre-commit \
         python-dateutil \
         requests
+
+
+# setuptools pyaudio SpeechRecognition --extra-index-url https://download.pytorch.org/whl/cu116  torch numpy
+
+# pip install numpy speechrecognition pywhispercpp
+# GGML_VULKAN=1 pip install git+https://github.com/absadiki/pywhispercpp
 }
